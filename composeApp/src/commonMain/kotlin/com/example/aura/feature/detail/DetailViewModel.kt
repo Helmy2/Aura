@@ -2,8 +2,7 @@ package com.example.aura.feature.detail
 
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.repository.WallpaperRepository
-import com.example.aura.shared.core.mvi.BaseViewModel
-import com.example.aura.shared.core.mvi.ReducerResult
+import com.example.aura.shared.core.mvi.MviViewModel
 import com.example.aura.shared.model.toUi
 import com.example.aura.shared.navigation.AppNavigator
 import kotlinx.coroutines.launch
@@ -11,39 +10,35 @@ import kotlinx.coroutines.launch
 class DetailViewModel(
     private val wallpaperRepository: WallpaperRepository,
     private val navigator: AppNavigator
-) : BaseViewModel<DetailState, DetailIntent, Nothing>(
+) : MviViewModel<DetailState, DetailIntent, Nothing>(
     initialState = DetailState()
 ) {
     override fun reduce(
-        oldState: DetailState,
+        currentState: DetailState,
         intent: DetailIntent
-    ): ReducerResult<DetailState, Nothing> {
+    ): Pair<DetailState, Nothing?> {
         return when (intent) {
             is DetailIntent.OnError -> {
-                ReducerResult(oldState.copy(isLoading = false, error = intent.message))
+                currentState.copy(isLoading = false, error = intent.message)
             }
 
             is DetailIntent.OnBackClicked -> {
                 navigator.back()
-                ReducerResult(
-                    newState = oldState,
-                )
+                currentState
             }
 
             is DetailIntent.OnScreenOpened -> {
                 loadWallpaperById(intent.wallpaperId)
-                ReducerResult(oldState.copy(isLoading = true, error = null))
+                currentState.copy(isLoading = true, error = null)
             }
 
             is DetailIntent.OnWallpaperLoaded -> {
-                ReducerResult(
-                    oldState.copy(
-                        isLoading = false,
-                        wallpaper = intent.wallpaper.toUi()
-                    )
+                currentState.copy(
+                    isLoading = false,
+                    wallpaper = intent.wallpaper.toUi()
                 )
             }
-        }
+        }.only()
     }
 
 

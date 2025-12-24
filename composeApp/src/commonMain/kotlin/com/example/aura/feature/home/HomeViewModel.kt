@@ -2,8 +2,7 @@ package com.example.aura.feature.home
 
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.repository.WallpaperRepository
-import com.example.aura.shared.core.mvi.BaseViewModel
-import com.example.aura.shared.core.mvi.ReducerResult
+import com.example.aura.shared.core.mvi.MviViewModel
 import com.example.aura.shared.model.toUi
 import com.example.aura.shared.navigation.AppNavigator
 import com.example.aura.shared.navigation.DetailRoute
@@ -12,7 +11,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val repository: WallpaperRepository,
     private val navigator: AppNavigator
-) : BaseViewModel<HomeState, HomeIntent, Nothing>(
+) : MviViewModel<HomeState, HomeIntent, Nothing>(
     initialState = HomeState()
 ) {
 
@@ -21,42 +20,66 @@ class HomeViewModel(
     }
 
     override fun reduce(
-        oldState: HomeState,
+        currentState: HomeState,
         intent: HomeIntent
-    ): ReducerResult<HomeState, Nothing> {
+    ): Pair<HomeState, Nothing?> {
         return when (intent) {
             is HomeIntent.LoadCuratedWallpapers -> {
-                viewModelScope.launch {
-                    try {
-                        val wallpapers = repository.getCuratedWallpapers()
-                        sendIntent(HomeIntent.OnWallpapersLoaded(wallpapers))
-                    } catch (e: Exception) {
-                        sendIntent(HomeIntent.OnError(e.message ?: "Unknown error"))
-                    }
-                }
-                ReducerResult(oldState.copy(isLoading = true, error = null))
-            }
-
-            is HomeIntent.OnWallpapersLoaded -> {
-                ReducerResult(
-                    oldState.copy(
-                        isLoading = false,
-                        wallpapers = intent.wallpapers.map {
-                            it.toUi()
-                        }
-                    )
-                )
+                loadWallpapers()
+                currentState.copy(isLoading = true, error = null)
             }
 
             is HomeIntent.OnError -> {
-                ReducerResult(oldState.copy(isLoading = false, error = intent.message))
+                currentState.copy(isLoading = false, error = intent.message)
             }
 
             is HomeIntent.OnWallpaperClicked -> {
                 navigator.navigate(DetailRoute(id = intent.wallpaperId))
-                ReducerResult(
-                    newState = oldState,
+                currentState
+            }
+
+            is HomeIntent.LoadNextPage -> {
+                if (!currentState.isPaginationLoading && !currentState.isEndReached) {
+                    loadWallpapers(page = currentState.currentPage + 1)
+                    currentState.copy(
+                        isPaginationLoading = true
+                    )
+                } else {
+                    currentState
+                }
+            }
+
+            is HomeIntent.AppendWallpapers -> {
+                val combinedList = currentState.wallpapers + intent.newWallpapers
+                currentState.copy(
+                    isLoading = false,
+                    isPaginationLoading = false,
+                    wallpapers = combinedList,
+                    currentPage = intent.page
                 )
+            }
+
+            is HomeIntent.SetEndReached -> {
+                currentState.copy(
+                    isEndReached = true
+                )
+            }
+        }.only()
+    }
+
+    private fun loadWallpapers(page: Int = 1) {
+        viewModelScope.launch {
+            try {
+                val newWallpapers = repository.getCuratedWallpapers(page = page)
+
+                if (newWallpapers.isEmpty()) {
+                    sendIntent(HomeIntent.SetEndReached)
+                } else {
+                    val uiWallpapers = newWallpapers.map { it.toUi() }
+                    sendIntent(HomeIntent.AppendWallpapers(uiWallpapers, page))
+                }
+            } catch (e: Exception) {
+                sendIntent(HomeIntent.OnError(e.message.orEmpty()))
             }
         }
     }

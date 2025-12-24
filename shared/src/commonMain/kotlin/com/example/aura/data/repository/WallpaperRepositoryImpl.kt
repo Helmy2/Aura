@@ -9,8 +9,8 @@ class WallpaperRepositoryImpl(
     private val api: PexelsApi
 ) : WallpaperRepository {
 
-    override suspend fun getCuratedWallpapers(): List<Wallpaper> {
-        val response = api.getCuratedWallpapers()
+    override suspend fun getCuratedWallpapers(page: Int): List<Wallpaper> {
+        val response = api.getWallpapers(page = page)
         return response.photos.map { it.toDomain() }
     }
 

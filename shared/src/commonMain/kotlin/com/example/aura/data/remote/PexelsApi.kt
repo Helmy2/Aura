@@ -9,14 +9,18 @@ import io.ktor.client.request.parameter
 
 class PexelsApi(val client: HttpClient) {
 
-    suspend fun getCuratedWallpapers(page: Int = 1, perPage: Int = 30): PexelsResponseDto {
+    suspend fun getWallpapers(page: Int = 1, perPage: Int = 30): PexelsResponseDto {
         return client.get("curated") {
             parameter("page", page)
             parameter("per_page", perPage)
         }.body()
     }
 
-    suspend fun searchWallpapers(query: String, page: Int = 1, perPage: Int = 30): PexelsResponseDto {
+    suspend fun searchWallpapers(
+        query: String,
+        page: Int = 1,
+        perPage: Int = 30
+    ): PexelsResponseDto {
         return client.get("search") {
             parameter("query", query)
             parameter("page", page)
