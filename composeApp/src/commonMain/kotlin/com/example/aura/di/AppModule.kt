@@ -2,7 +2,7 @@ package com.example.aura.di
 
 import com.example.aura.feature.detail.DetailViewModel
 import com.example.aura.feature.home.HomeViewModel
-import com.example.aura.navigation.AppNavigator
+import com.example.aura.shared.navigation.AppNavigator
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

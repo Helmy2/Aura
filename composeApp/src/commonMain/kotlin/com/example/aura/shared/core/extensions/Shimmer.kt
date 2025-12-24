@@ -1,4 +1,4 @@
-package com.example.aura.core.extensions
+package com.example.aura.shared.core.extensions
 
 
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -13,34 +13,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import com.example.aura.shared.designsystem.theme.ShimmerBase
+import com.example.aura.shared.designsystem.theme.ShimmerHighlight
 
 fun Modifier.shimmerEffect(): Modifier = composed {
     val transition = rememberInfiniteTransition(label = "shimmer")
 
-    // Animate the gradient position
     val translateAnimation by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                easing = FastOutSlowInEasing
-            ),
+            animation = tween(durationMillis = 1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "shimmerTranslate"
     )
 
-    // "Summer" Theme Colors
-    val shimmerColors = listOf(
-        Color(0xFFBDBDBD),
-        Color(0xFFF5F5F5),
-        Color(0xFFBDBDBD)
-    )
-
     val brush = Brush.linearGradient(
-        colors = shimmerColors,
+        colors = listOf(ShimmerBase, ShimmerHighlight, ShimmerBase),
         start = Offset.Zero,
         end = Offset(x = translateAnimation, y = translateAnimation)
     )

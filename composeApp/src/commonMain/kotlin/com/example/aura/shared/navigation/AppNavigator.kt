@@ -1,4 +1,4 @@
-package com.example.aura.navigation
+package com.example.aura.shared.navigation
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.navigation3.runtime.NavKey

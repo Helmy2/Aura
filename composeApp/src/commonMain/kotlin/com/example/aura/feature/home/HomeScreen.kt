@@ -18,7 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,8 +26,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.SubcomposeAsyncImage
-import com.example.aura.core.extensions.shimmerEffect
-import com.example.aura.domain.model.Wallpaper
+import com.example.aura.shared.core.extensions.shimmerEffect
+import com.example.aura.shared.designsystem.theme.dimens
+import com.example.aura.shared.model.WallpaperUi
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -62,9 +62,10 @@ fun HomeScreen() {
     }
 }
 
+@Suppress("ParamsComparedByRef")
 @Composable
 fun WallpaperGrid(
-    wallpapers: List<Wallpaper>,
+    wallpapers: List<WallpaperUi>,
     windowSizeClass: WindowSizeClass,
     onWallpaperClick: (Long) -> Unit,
 ) {
@@ -79,7 +80,7 @@ fun WallpaperGrid(
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = minSize),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(MaterialTheme.dimens.md),
         state = rememberLazyGridState()
     ) {
         items(wallpapers, key = { it.id }) { wallpaper ->
@@ -90,13 +91,13 @@ fun WallpaperGrid(
 
 @Composable
 fun WallpaperItem(
-    wallpaper: Wallpaper,
+    wallpaper: WallpaperUi,
     onClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
-            .padding(4.dp)
+            .padding(MaterialTheme.dimens.xs)
             .fillMaxWidth()
             .aspectRatio(0.7f)
             .clickable { onClick(wallpaper.id) }

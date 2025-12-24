@@ -1,4 +1,4 @@
-package com.example.aura.navigation
+package com.example.aura.shared.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

@@ -1,11 +1,12 @@
 package com.example.aura.feature.home
 
 import androidx.lifecycle.viewModelScope
-import com.example.aura.core.mvi.BaseViewModel
-import com.example.aura.core.mvi.ReducerResult
 import com.example.aura.domain.repository.WallpaperRepository
-import com.example.aura.navigation.AppNavigator
-import com.example.aura.navigation.DetailRoute
+import com.example.aura.shared.core.mvi.BaseViewModel
+import com.example.aura.shared.core.mvi.ReducerResult
+import com.example.aura.shared.model.toUi
+import com.example.aura.shared.navigation.AppNavigator
+import com.example.aura.shared.navigation.DetailRoute
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -37,7 +38,14 @@ class HomeViewModel(
             }
 
             is HomeIntent.OnWallpapersLoaded -> {
-                ReducerResult(oldState.copy(isLoading = false, wallpapers = intent.wallpapers))
+                ReducerResult(
+                    oldState.copy(
+                        isLoading = false,
+                        wallpapers = intent.wallpapers.map {
+                            it.toUi()
+                        }
+                    )
+                )
             }
 
             is HomeIntent.OnError -> {

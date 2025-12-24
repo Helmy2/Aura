@@ -1,10 +1,11 @@
 package com.example.aura.feature.detail
 
 import androidx.lifecycle.viewModelScope
-import com.example.aura.core.mvi.BaseViewModel
-import com.example.aura.core.mvi.ReducerResult
 import com.example.aura.domain.repository.WallpaperRepository
-import com.example.aura.navigation.AppNavigator
+import com.example.aura.shared.core.mvi.BaseViewModel
+import com.example.aura.shared.core.mvi.ReducerResult
+import com.example.aura.shared.model.toUi
+import com.example.aura.shared.navigation.AppNavigator
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
@@ -22,7 +23,7 @@ class DetailViewModel(
                 ReducerResult(oldState.copy(isLoading = false, error = intent.message))
             }
 
-            is DetailIntent.OnBackCLicked -> {
+            is DetailIntent.OnBackClicked -> {
                 navigator.back()
                 ReducerResult(
                     newState = oldState,
@@ -35,7 +36,12 @@ class DetailViewModel(
             }
 
             is DetailIntent.OnWallpaperLoaded -> {
-                ReducerResult(oldState.copy(isLoading = false, wallpaper = intent.wallpaper))
+                ReducerResult(
+                    oldState.copy(
+                        isLoading = false,
+                        wallpaper = intent.wallpaper.toUi()
+                    )
+                )
             }
         }
     }

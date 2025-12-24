@@ -1,10 +1,11 @@
 package com.example.aura.feature.home
 
 import com.example.aura.domain.model.Wallpaper
+import com.example.aura.shared.model.WallpaperUi
 
 data class HomeState(
     val isLoading: Boolean = true,
-    val wallpapers: List<Wallpaper> = emptyList(),
+    val wallpapers: List<WallpaperUi> = emptyList(),
     val error: String? = null
 )
 

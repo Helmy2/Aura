@@ -1,4 +1,4 @@
-package com.example.aura.core.mvi
+package com.example.aura.shared.core.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
