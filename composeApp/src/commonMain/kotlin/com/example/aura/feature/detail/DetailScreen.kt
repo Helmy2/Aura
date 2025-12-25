@@ -19,7 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.aura.shared.core.extensions.toColor
 import com.example.aura.shared.designsystem.component.AuraImage
 import com.example.aura.shared.designsystem.component.AuraTransparentTopBar
 import com.example.aura.shared.designsystem.theme.dimens
@@ -43,11 +45,17 @@ fun DetailScreen(
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(color = state.wallpaper?.averageColor?.toColor() ?: Color.Transparent)
+        ) {
             AuraImage(
                 imageUrl = state.wallpaper?.imageUrl,
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize()
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.align(
+                    Alignment.Center
+                )
             )
 
             AuraTransparentTopBar(
