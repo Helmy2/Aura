@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -23,23 +22,15 @@ kotlin {
             isStatic = true
         }
     }
-    
-    jvm()
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.koin.core)
             implementation(libs.bundles.ktor)
-            implementation(libs.napier)
             implementation(libs.ktor.client.logging)
         }
         androidMain.dependencies {
-            implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
-        }
-        jvmMain.dependencies {
-            implementation(libs.kotlinx.coroutinesSwing)
-            implementation(libs.ktor.client.java)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
