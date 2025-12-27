@@ -1,43 +1,50 @@
 import Foundation
-import Combine
-import Shared // KMP Module
+import Shared
+import Observation
 
-@MainActor
-class HomeViewModel: ObservableObject {
+@Observable
+class HomeViewModel {
     // MARK: - State
-    // We separate curated vs search to avoid losing position when clearing search
-    @Published var wallpapers: [WallpaperUi] = []
-    @Published var searchWallpapers: [WallpaperUi] = []
-    
-    @Published var isLoading: Bool = false
-    @Published var isPaginationLoading: Bool = false
-    @Published var errorMessage: String? = nil
+    var wallpapers: [WallpaperUi] = []
+    var searchWallpapers: [WallpaperUi] = []
+    var isLoading: Bool = false
+    var isPaginationLoading: Bool = false
+    var errorMessage: String? = nil
     
     // Search State
-    @Published var isSearchMode: Bool = false
-    @Published var searchQuery: String = ""
+    var isSearchMode: Bool = false
+    var searchQuery: String = ""
     
     // Pagination State
     private var currentPage: Int = 1
     private var isEndReached: Bool = false
+
+    // Favorite State
+    private var favoriteIds: Set<Int64> = [] // ✅ Cache favorite IDs
     
     // Dependencies
     private let repository: WallpaperRepository
+    private let favoritesRepository: FavoritesRepository
     
     init() {
         self.repository = KoinHelper().wallpaperRepository
+        self.favoritesRepository = KoinHelper().favoritesRepository
+
+        // Start observing favorites first
+        observeFavorites()
+
+        // Then load wallpapers
         loadCuratedWallpapers(reset: true)
     }
     
     // MARK: - Intents
-    
     func loadCuratedWallpapers(reset: Bool = false) {
         if reset {
             self.isLoading = true
             self.currentPage = 1
             self.wallpapers = []
             self.isEndReached = false
-            self.isSearchMode = false // Ensure we are in curated mode
+            self.isSearchMode = false
         } else {
             guard !isPaginationLoading && !isEndReached else { return }
             self.isPaginationLoading = true
@@ -48,46 +55,56 @@ class HomeViewModel: ObservableObject {
     
     func onSearchTriggered() {
         guard !searchQuery.isEmpty else { return }
-        
         self.isSearchMode = true
         self.isLoading = true
         self.currentPage = 1
         self.searchWallpapers = []
         self.isEndReached = false
-        
         performFetch(query: searchQuery, page: 1, isSearch: true)
     }
     
     func onClearSearch() {
         self.isSearchMode = false
         self.searchQuery = ""
-        self.isEndReached = false // Reset pagination block for curated list
-        // Note: We don't reload curated wallpapers here to keep the user's place.
+        self.isEndReached = false
     }
     
     func loadNextPage() {
         guard !isPaginationLoading && !isEndReached else { return }
         self.isPaginationLoading = true
-        
-        let nextPage = currentPage + 1 // Note: currentPage is updated on success
-        
+        let nextPage = currentPage + 1
         if isSearchMode {
             performFetch(query: searchQuery, page: nextPage, isSearch: true)
         } else {
             performFetch(query: nil, page: nextPage, isSearch: false)
         }
     }
+
+    func toggleFavorite(wallpaper: WallpaperUi) {
+        Task {
+            do {
+                let kmWallpaper = wallpaper.toDomain()
+                try await favoritesRepository.toggleFavorite(wallpaper: kmWallpaper)
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
     
     // MARK: - Private Logic
-    
     private func performFetch(query: String?, page: Int, isSearch: Bool) {
         Task {
             do {
                 let result: [Wallpaper]
                 if let query = query, isSearch {
-                    result = try await repository.searchWallpapers(query: query, page: Int32(page))
+                    result = try await repository.searchWallpapers(
+                        query: query,
+                        page: Int32(page)
+                    )
                 } else {
-                    result = try await repository.getCuratedWallpapers(page: Int32(page))
+                    result = try await repository.getCuratedWallpapers(
+                        page: Int32(page)
+                    )
                 }
                 
                 if result.isEmpty {
@@ -95,15 +112,23 @@ class HomeViewModel: ObservableObject {
                     self.isLoading = false
                     self.isPaginationLoading = false
                 } else {
-                    let uiResults = result.map { $0.toUi() }
+                    // ✅ Use cached favorite IDs when creating UI models
+                    let uiResults = result.map {
+                        $0.toUi(isFavorite: favoriteIds.contains($0.id))
+                    }
                     
                     if isSearch {
                         if page == 1 {
                             self.searchWallpapers = uiResults
                         } else {
-                            // Simple deduplication
-                            let existingIds = Set(self.searchWallpapers.map { $0.id })
-                            let newUnique = uiResults.filter { !existingIds.contains($0.id) }
+                            let existingIds = Set(
+                                self.searchWallpapers.map {
+                                    $0.id
+                                }
+                            )
+                            let newUnique = uiResults.filter {
+                                !existingIds.contains($0.id)
+                            }
                             self.searchWallpapers.append(contentsOf: newUnique)
                         }
                     } else {
@@ -111,11 +136,12 @@ class HomeViewModel: ObservableObject {
                             self.wallpapers = uiResults
                         } else {
                             let existingIds = Set(self.wallpapers.map { $0.id })
-                            let newUnique = uiResults.filter { !existingIds.contains($0.id) }
+                            let newUnique = uiResults.filter {
+                                !existingIds.contains($0.id)
+                            }
                             self.wallpapers.append(contentsOf: newUnique)
                         }
                     }
-                    
                     self.currentPage = page
                     self.isLoading = false
                     self.isPaginationLoading = false
@@ -126,5 +152,46 @@ class HomeViewModel: ObservableObject {
                 self.isPaginationLoading = false
             }
         }
+    }
+
+    private func observeFavorites() {
+        favoritesRepository.getAllFavorites().collect(
+            collector: Collector<[Wallpaper]> { [weak self] favorites in
+                guard let self = self else {
+                    return
+                }
+
+                Task { @MainActor in
+                    // ✅ Update cached favorite IDs
+                    self.favoriteIds = Set(favorites.map {
+                        $0.id
+                    })
+
+                    // Update existing wallpapers
+                    self.wallpapers = self.wallpapers.map { wallpaper in
+                        var updated = wallpaper
+                        updated.isFavorite = self.favoriteIds.contains(wallpaper.id)
+                        return updated
+                    }
+
+                    // Update search wallpapers
+                    self.searchWallpapers = self.searchWallpapers.map { wallpaper in
+                        var updated = wallpaper
+                        updated.isFavorite = self.favoriteIds.contains(wallpaper.id)
+                        return updated
+                    }
+                }
+            },
+            completionHandler: { [weak self] error in
+                guard let self = self else {
+                    return
+                }
+                Task { @MainActor in
+                    if let error = error {
+                        self.errorMessage = error.localizedDescription
+                    }
+                }
+            }
+        )
     }
 }

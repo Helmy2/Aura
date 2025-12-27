@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		185B3E552F004B02002F29DF /* libsqlite3.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 185B3E542F004B02002F29DF /* libsqlite3.0.tbd */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		185B3E542F004B02002F29DF /* libsqlite3.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.0.tbd; path = usr/lib/libsqlite3.0.tbd; sourceTree = SDKROOT; };
 		9150EFE6DCDB9AC4449652B2 /* Aura.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aura.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -41,12 +46,21 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				185B3E552F004B02002F29DF /* libsqlite3.0.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		185B3E532F004B02002F29DF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				185B3E542F004B02002F29DF /* libsqlite3.0.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1D13E43F914E1C7C27E6D135 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -60,6 +74,7 @@
 			children = (
 				7A78491BC665AA5704D53592 /* Configuration */,
 				5BF2E54C4F334CADF50BC8A5 /* iosApp */,
+				185B3E532F004B02002F29DF /* Frameworks */,
 				1D13E43F914E1C7C27E6D135 /* Products */,
 			);
 			sourceTree = "<group>";
