@@ -32,6 +32,20 @@ struct WallpaperUi: Identifiable, Equatable, Hashable {
 }
 
 extension WallpaperUi {
+    func copy(isFavorite: Bool? = nil) -> WallpaperUi {
+        return WallpaperUi(
+            id: self.id,
+            imageUrl: self.imageUrl,
+            smallImageUrl: self.smallImageUrl,
+            photographerName: self.photographerName,
+            photographerUrl: self.photographerUrl,
+            averageColor: self.averageColor,
+            height: self.height,
+            width: self.width,
+            isFavorite: isFavorite ?? self.isFavorite
+        )
+    }
+
     func toDomain() -> Wallpaper {
         return Wallpaper(
             id: self.id,

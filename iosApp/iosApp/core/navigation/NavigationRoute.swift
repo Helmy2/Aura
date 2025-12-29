@@ -11,6 +11,7 @@ import Shared
 enum NavigationRoute: Hashable {
     case home
     case favorites
+    case settings
     case detail(wallpaper: WallpaperUi)
 
     // Hashable conformance
@@ -18,6 +19,8 @@ enum NavigationRoute: Hashable {
         switch self {
         case .home:
             hasher.combine("home")
+        case .settings:
+            hasher.combine("settings")
         case .favorites:
             hasher.combine("favorites")
         case .detail(let wallpaper):
@@ -31,6 +34,8 @@ enum NavigationRoute: Hashable {
         case (.home, .home):
             return true
         case (.favorites, .favorites):
+            return true
+        case (.settings, .settings):
             return true
         case (.detail(let lhs), .detail(let rhs)):
             return lhs.id == rhs.id

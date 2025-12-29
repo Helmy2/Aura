@@ -18,6 +18,7 @@ class NavigationCoordinator {
     enum Tab {
         case home
         case favorites
+        case settings
     }
 
     // Navigate to detail

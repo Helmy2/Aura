@@ -23,7 +23,6 @@ class DetailViewModel {
             do {
                 self.isFavorite = try await repository.isFavorite(wallpaperId: wallpaperId).boolValue
             } catch {
-                // Silent fail
                 print("Failed to load favorite status: \(error)")
             }
         }

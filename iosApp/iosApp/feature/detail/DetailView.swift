@@ -8,7 +8,9 @@ struct DetailView: View {
 
     var body: some View {
         ZStack {
+            // 1. Background Layer (Color + Image)
             Color(hex: wallpaper.averageColor)
+                .ignoresSafeArea()
 
             AsyncImage(url: URL(string: wallpaper.imageUrl)) { phase in
                 switch phase {
@@ -18,34 +20,42 @@ struct DetailView: View {
                         .aspectRatio(contentMode: .fit)
                 case .empty:
                     ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(.white)
                 default:
-                    Color.black
+                    Color.clear
                 }
             }
+            .ignoresSafeArea()
 
-            // Top Bar with Back, Favorite and Download
+            // 2. UI Overlay Layer
             VStack {
+                // --- Top Bar ---
                 HStack {
                     // Back Button
-                    Button(action: {
-                        coordinator.pop()
-                    }) {
+                    Button(action: { coordinator.pop() }) {
                         Image(systemName: "chevron.left")
-                            .font(.title3)
+                            .font(.system(size: 20, weight: .medium))
                             .foregroundStyle(.white)
-                            .padding(8)
+                            .padding(12)
                             .background(.ultraThinMaterial, in: Circle())
                     }
 
                     Spacer()
 
                     // Favorite Button
-                    FavoriteButton(
-                        isFavorite: viewModel.isFavorite,
-                        action: {
-                            viewModel.toggleFavorite(wallpaper: wallpaper)
-                        }
-                    )
+                    Button(action: {
+                        viewModel.toggleFavorite(wallpaper: wallpaper)
+                    }) {
+                        Image(
+                            systemName: viewModel.isFavorite
+                                ? "heart.fill" : "heart"
+                        )
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundStyle(viewModel.isFavorite ? .red : .white)
+                            .padding(12)
+                            .background(.ultraThinMaterial, in: Circle())
+                    }
 
                     // Download Button
                     Button(action: {
@@ -54,85 +64,51 @@ struct DetailView: View {
                         ZStack {
                             if viewModel.isDownloading {
                                 ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .frame(width: 20, height: 20)
+                                    .tint(.white)
                             } else {
-                                Image(systemName: "arrow.down.circle.fill")
-                                    .font(.system(size: 20))
+                                Image(systemName: "arrow.down")
+                                    .font(.system(size: 20, weight: .medium))
                                     .foregroundStyle(.white)
                             }
                         }
-                        .padding(8)
+                        .padding(12)
                         .background(.ultraThinMaterial, in: Circle())
                     }
                     .disabled(viewModel.isDownloading)
                 }
                 .padding(.horizontal)
-                .padding(.top, getSafeAreaTop() + 8)
 
                 Spacer()
-            }
-            
-            // Scrim & Metadata Overlay
-            VStack {
-                Spacer()
-                ZStack(alignment: .bottom) {
-                    LinearGradient(
-                        colors: [.black.opacity(0.8), .clear],
-                        startPoint: .bottom,
-                        endPoint: .top
-                    )
-                    .frame(height: 160)
 
-                    Text(wallpaper.photographerName)
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .padding(.bottom, getSafeAreaBottom() + 20)
+                // --- Bottom Metadata Bar ---
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(wallpaper.photographerName)
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.white)
+
+                        Text("Photographer")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "camera.fill")
+                        .foregroundStyle(.white.opacity(0.6))
                 }
+                .padding()
+                .background(.ultraThinMaterial)
+                .cornerRadius(20)
+                .padding(.horizontal)
+                .padding(.bottom)
             }
         }
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .tabBar)
-        .ignoresSafeArea()
         .onAppear {
             viewModel.loadFavoriteStatus(wallpaperId: wallpaper.id)
         }
-    }
-
-    // MARK: - Safe Area Helpers
-    private func getSafeAreaTop() -> CGFloat {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow })
-        else {
-            return 0
-        }
-        return window.safeAreaInsets.top
-    }
-
-    private func getSafeAreaBottom() -> CGFloat {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow })
-        else {
-            return 0
-        }
-        return window.safeAreaInsets.bottom
-    }
-}
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(
-            in: CharacterSet.alphanumerics.inverted
-        )
-
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let r = Double((int >> 16) & 0xFF) / 255
-        let g = Double((int >> 8) & 0xFF) / 255
-        let b = Double(int & 0xFF) / 255
-        self.init(red: r, green: g, blue: b)
     }
 }

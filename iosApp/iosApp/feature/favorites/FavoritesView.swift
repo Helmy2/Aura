@@ -12,8 +12,12 @@ struct FavoritesView: View {
 
     var body: some View {
         content
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.large)
+        .onAppear {
+            viewModel.startObserving()
+        }
+        .onDisappear {
+            viewModel.stopObserving()
+        }
     }
 
     // MARK: - Subviews
