@@ -28,7 +28,7 @@ class FavoritesViewModel {
         observationTask = Task { @MainActor in
             for await wallpapers in repository.observeFavorites() {
                 let uiList = wallpapers.map {
-                    $0.toUi(isFavorite: true)
+                    $0.toUi()
                 }
 
                 self.favorites = uiList

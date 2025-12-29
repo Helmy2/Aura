@@ -29,7 +29,6 @@ class HomeViewModel {
         observeFavorites()
         loadCuratedWallpapers(reset: true)
     }
-    
 
     // MARK: - Intents
     func loadCuratedWallpapers(reset: Bool = false) {
@@ -78,7 +77,6 @@ class HomeViewModel {
         favoritesTask?.cancel()
     }
 
-
     // MARK: - Intents (Updated toggleFavorite)
 
     func toggleFavorite(wallpaper: WallpaperUi) {
@@ -98,9 +96,11 @@ class HomeViewModel {
         favoritesTask?.cancel()
         favoritesTask = Task { @MainActor in
             for await favorites in repository.observeFavorites() {
-                let favoriteIds = Set(favorites.map {
-                    $0.id
-                })
+                let favoriteIds = Set(
+                    favorites.map {
+                        $0.id
+                    }
+                )
                 self.updateFavoritesState(favoriteIds: favoriteIds)
             }
         }
@@ -149,7 +149,7 @@ class HomeViewModel {
                     }
                 } else {
                     let uiResults = result.map {
-                        $0.toUi(isFavorite: $0.isFavorite)
+                        $0.toUi()
                     }
 
                     await MainActor.run {

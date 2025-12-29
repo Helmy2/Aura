@@ -62,7 +62,7 @@ extension WallpaperUi {
 }
 
 extension Wallpaper {
-    func toUi(isFavorite: Bool) -> WallpaperUi {
+    func toUi() -> WallpaperUi {
         return WallpaperUi(
             id: self.id,
             imageUrl: self.imageUrl,
@@ -72,7 +72,7 @@ extension Wallpaper {
             averageColor: self.averageColor,
             height: Int(self.height),
             width: Int(self.width),
-            isFavorite: isFavorite
+            isFavorite: self.isFavorite
         )
     }
 }
