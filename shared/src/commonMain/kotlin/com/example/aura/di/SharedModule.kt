@@ -5,15 +5,21 @@ import com.example.aura.data.local.WallpaperLocalDataSource
 import com.example.aura.data.local.database.DatabaseDriverFactory
 import com.example.aura.data.remote.PexelsRemoteDataSource
 import com.example.aura.data.repository.SettingsRepositoryImpl
+import com.example.aura.data.repository.VideoRepositoryImpl
 import com.example.aura.data.repository.WallpaperRepositoryImpl
 import com.example.aura.data.util.TimeManagerImpl
 import com.example.aura.database.AuraDatabase
 import com.example.aura.domain.repository.SettingsRepository
+import com.example.aura.domain.repository.VideoRepository
 import com.example.aura.domain.repository.WallpaperRepository
 import com.example.aura.domain.util.TimeManager
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -46,9 +52,12 @@ fun sharedModule(apiKey: String) = module {
                     isLenient = true
                 })
             }
+            install(Logging) {
+                logger = Logger.SIMPLE
+                level = LogLevel.ALL
+            }
             defaultRequest {
                 header("Authorization", apiKey)
-                url("https://api.pexels.com/v1/")
             }
         }
     }
@@ -59,4 +68,5 @@ fun sharedModule(apiKey: String) = module {
 
     singleOf(::WallpaperRepositoryImpl).bind<WallpaperRepository>()
     singleOf(::SettingsRepositoryImpl).bind<SettingsRepository>()
+    singleOf(::VideoRepositoryImpl).bind<VideoRepository>()
 }

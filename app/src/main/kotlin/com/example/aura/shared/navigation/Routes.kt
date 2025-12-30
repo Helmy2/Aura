@@ -16,4 +16,10 @@ sealed interface Destination : NavKey {
 
     @Serializable
     data object Settings : Destination
+
+    @Serializable
+    data object Videos : Destination
+
+    @Serializable
+    data class VideoDetail(val id: Long) : Destination
 }

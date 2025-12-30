@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     implementation(libs.bundles.coil)
+    implementation(libs.bundles.media3)
     implementation(libs.bundles.nav3)
     implementation(libs.bundles.compose)
     implementation(libs.adaptive)

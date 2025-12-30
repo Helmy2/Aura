@@ -3,6 +3,7 @@ package com.example.aura.shared.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
@@ -22,6 +23,12 @@ val bottomNavItems = listOf(
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home,
         destination = Destination.Home
+    ),
+    BottomNavItem(
+        "Videos",
+        Icons.Filled.PlayArrow,
+        Icons.Filled.PlayArrow,
+        Destination.Videos,
     ),
     BottomNavItem(
         title = "Favorites",
