@@ -19,16 +19,6 @@ struct WallpaperUi: Identifiable, Equatable, Hashable {
     let height: Int
     let width: Int
     var isFavorite: Bool
-
-    // Equatable conformance
-    static func ==(lhs: WallpaperUi, rhs: WallpaperUi) -> Bool {
-        return lhs.id == rhs.id
-    }
-
-    // Hashable conformance
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
 }
 
 extension WallpaperUi {

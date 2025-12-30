@@ -17,13 +17,18 @@ class NavigationCoordinator {
 
     enum Tab {
         case home
+        case videos
         case favorites
         case settings
     }
 
     // Navigate to detail
     func navigateToDetail(wallpaper: WallpaperUi) {
-        path.append(NavigationRoute.detail(wallpaper: wallpaper))
+        path.append(NavigationRoute.detail(wallpaper))
+    }
+
+    func navigateToVideoDetail(video: VideoUi) {
+        path.append(NavigationRoute.videoDetail(video))
     }
 
     // Pop to root
@@ -43,4 +48,6 @@ class NavigationCoordinator {
         selectedTab = tab
         popToRoot()
     }
+
+
 }

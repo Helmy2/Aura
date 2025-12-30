@@ -14,7 +14,6 @@ struct HomeView: View {
         content
             .navigationBarHidden(true)
             .onAppear {
-                // Force reload if empty
                 if viewModel.wallpapers.isEmpty && !viewModel.isLoading {
                     viewModel.loadCuratedWallpapers(reset: true)
                 }

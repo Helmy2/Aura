@@ -12,7 +12,8 @@ enum NavigationRoute: Hashable {
     case home
     case favorites
     case settings
-    case detail(wallpaper: WallpaperUi)
+    case detail(WallpaperUi)
+    case videoDetail(VideoUi)
 
     // Hashable conformance
     func hash(into hasher: inout Hasher) {
@@ -23,6 +24,8 @@ enum NavigationRoute: Hashable {
             hasher.combine("settings")
         case .favorites:
             hasher.combine("favorites")
+        case .videoDetail:
+            hasher.combine("videoDetail")
         case .detail(let wallpaper):
             hasher.combine("detail")
             hasher.combine(wallpaper.id)
@@ -38,6 +41,8 @@ enum NavigationRoute: Hashable {
         case (.settings, .settings):
             return true
         case (.detail(let lhs), .detail(let rhs)):
+            return lhs.id == rhs.id
+        case (.videoDetail(let lhs), .videoDetail(let rhs)):
             return lhs.id == rhs.id
         default:
             return false

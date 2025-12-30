@@ -27,7 +27,6 @@ class HomeViewModel {
     init() {
         self.repository = KoinHelper().wallpaperRepository
         observeFavorites()
-        loadCuratedWallpapers(reset: true)
     }
 
     // MARK: - Intents
@@ -111,16 +110,15 @@ class HomeViewModel {
         for i in 0..<wallpapers.count {
             let isFav = favoriteIds.contains(wallpapers[i].id)
             if wallpapers[i].isFavorite != isFav {
-                wallpapers[i] = wallpapers[i].copy(isFavorite: isFav)
+                wallpapers[i].isFavorite = isFav
             }
         }
 
+        // Update search list if active
         for i in 0..<searchWallpapers.count {
             let isFav = favoriteIds.contains(searchWallpapers[i].id)
             if searchWallpapers[i].isFavorite != isFav {
-                searchWallpapers[i] = searchWallpapers[i].copy(
-                    isFavorite: isFav
-                )
+                searchWallpapers[i].isFavorite = isFav
             }
         }
     }

@@ -38,6 +38,8 @@ struct ContentView: View {
                 switch coordinator.selectedTab {
                 case .home:
                     HomeNavigationStack(coordinator: coordinator)
+                case .videos:
+                    VideosNavigationStack(coordinator: coordinator)
                 case .favorites:
                     FavoritesNavigationStack(coordinator: coordinator)
                 case .settings:
@@ -107,6 +109,25 @@ struct SettingNavigationStack: View {
     var body: some View {
         NavigationStack(path: $coordinator.path) {
             SettingsView()
+        }
+    }
+}
+
+struct VideosNavigationStack: View {
+    @Bindable var coordinator: NavigationCoordinator
+
+    var body: some View {
+        NavigationStack(path: $coordinator.path) {
+            VideosView(coordinator: coordinator)
+                .navigationDestination(for: NavigationRoute.self) { route in
+                    switch route {
+                    case .videoDetail(let video):
+                        VideoDetailView(
+                            video: video
+                        ).toolbar(.hidden, for: .navigationBar)
+                    default: EmptyView()
+                    }
+                }
         }
     }
 }
