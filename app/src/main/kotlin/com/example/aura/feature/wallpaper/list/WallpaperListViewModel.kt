@@ -1,4 +1,4 @@
-package com.example.aura.feature.home
+package com.example.aura.feature.wallpaper.list
 
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.repository.WallpaperRepository
@@ -11,38 +11,38 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+class WallpaperListViewModel(
     private val wallpaperRepository: WallpaperRepository, private val navigator: AppNavigator
-) : MviViewModel<HomeState, HomeIntent, Nothing>(
-    initialState = HomeState()
+) : MviViewModel<WallpaperListState, WallpaperListIntent, Nothing>(
+    initialState = WallpaperListState()
 ) {
 
     init {
-        sendIntent(HomeIntent.LoadCuratedWallpapers)
+        sendIntent(WallpaperListIntent.LoadCuratedWallpapers)
         observeFavorites()
     }
 
     override fun reduce(
-        currentState: HomeState, intent: HomeIntent
-    ): Pair<HomeState, Nothing?> {
+        currentState: WallpaperListState, intent: WallpaperListIntent
+    ): Pair<WallpaperListState, Nothing?> {
         return when (intent) {
-            is HomeIntent.LoadCuratedWallpapers -> {
+            is WallpaperListIntent.LoadCuratedWallpapers -> {
                 loadWallpapers()
                 currentState.copy(
                     isSearchMode = false, searchQuery = "", isLoading = true
                 ).only()
             }
 
-            is HomeIntent.OnError -> {
+            is WallpaperListIntent.OnError -> {
                 currentState.copy(isLoading = false, error = intent.message).only()
             }
 
-            is HomeIntent.OnWallpaperClicked -> {
-                navigator.navigate(Destination.Detail(id = intent.wallpaper.id))
+            is WallpaperListIntent.OnWallpaperClicked -> {
+                navigator.navigate(Destination.WallpaperDetail(wallpaper = intent.wallpaper))
                 currentState.only()
             }
 
-            is HomeIntent.LoadNextPage -> {
+            is WallpaperListIntent.LoadNextPage -> {
                 if (!currentState.isPaginationLoading && !currentState.isEndReached) {
                     if (currentState.isSearchMode) {
                         performSearch(currentState.searchQuery, page = currentState.currentPage + 1)
@@ -55,7 +55,7 @@ class HomeViewModel(
                 }
             }
 
-            is HomeIntent.AppendWallpapers -> {
+            is WallpaperListIntent.AppendWallpapers -> {
                 if (currentState.isSearchMode) {
                     currentState.copy(
                         searchWallpapers = currentState.searchWallpapers + intent.newWallpapers,
@@ -73,15 +73,15 @@ class HomeViewModel(
                 }
             }
 
-            is HomeIntent.SetEndReached -> {
+            is WallpaperListIntent.SetEndReached -> {
                 currentState.copy(isEndReached = true).only()
             }
 
-            is HomeIntent.OnSearchQueryChanged -> {
+            is WallpaperListIntent.OnSearchQueryChanged -> {
                 currentState.copy(searchQuery = intent.query).only()
             }
 
-            is HomeIntent.OnSearchTriggered -> {
+            is WallpaperListIntent.OnSearchTriggered -> {
                 if (currentState.searchQuery.isBlank()) {
                     currentState.only()
                 } else {
@@ -96,7 +96,7 @@ class HomeViewModel(
                 }
             }
 
-            is HomeIntent.OnClearSearch -> {
+            is WallpaperListIntent.OnClearSearch -> {
                 currentState.copy(
                     isSearchMode = false,
                     searchQuery = "",
@@ -104,20 +104,20 @@ class HomeViewModel(
                 ).only()
             }
 
-            is HomeIntent.ToggleFavorite -> {
+            is WallpaperListIntent.ToggleFavorite -> {
                 viewModelScope.launch {
                     try {
                         val wallpaper =
                             wallpaperRepository.getWallpaperById(id = intent.wallpaper.id)
                         wallpaperRepository.toggleFavorite(wallpaper)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
 
                     }
                 }
                 currentState.only()
             }
 
-            is HomeIntent.FavoriteStatusUpdated -> {
+            is WallpaperListIntent.FavoriteStatusUpdated -> {
                 val updatedWallpapers = currentState.wallpapers.map { wallpaper ->
                     wallpaper.copy(isFavorite = intent.favoriteIds.contains(wallpaper.id))
                 }
@@ -131,6 +131,11 @@ class HomeViewModel(
                     favoriteIds = intent.favoriteIds
                 ).only()
             }
+
+            is WallpaperListIntent.OnNavigateBack -> {
+                navigator.back()
+                currentState.only()
+            }
         }
     }
 
@@ -140,13 +145,13 @@ class HomeViewModel(
                 val wallpapers = wallpaperRepository.getCuratedWallpapers(page = page)
 
                 if (wallpapers.isEmpty()) {
-                    sendIntent(HomeIntent.SetEndReached)
+                    sendIntent(WallpaperListIntent.SetEndReached)
                 } else {
                     val uiWallpapers = wallpapers.map { it.toUi(isFavorite = it.isFavorite) }
-                    sendIntent(HomeIntent.AppendWallpapers(uiWallpapers, page))
+                    sendIntent(WallpaperListIntent.AppendWallpapers(uiWallpapers, page))
                 }
             } catch (e: Exception) {
-                sendIntent(HomeIntent.OnError(e.message.orEmpty()))
+                sendIntent(WallpaperListIntent.OnError(e.message.orEmpty()))
             }
         }
     }
@@ -157,13 +162,13 @@ class HomeViewModel(
                 val results = wallpaperRepository.searchWallpapers(query, page)
 
                 if (results.isEmpty()) {
-                    sendIntent(HomeIntent.SetEndReached)
+                    sendIntent(WallpaperListIntent.SetEndReached)
                 } else {
                     val uiWallpapers = results.map { it.toUi(isFavorite = it.isFavorite) }
-                    sendIntent(HomeIntent.AppendWallpapers(uiWallpapers, page))
+                    sendIntent(WallpaperListIntent.AppendWallpapers(uiWallpapers, page))
                 }
             } catch (e: Exception) {
-                sendIntent(HomeIntent.OnError(e.message.orEmpty()))
+                sendIntent(WallpaperListIntent.OnError(e.message.orEmpty()))
             }
         }
     }
@@ -171,7 +176,7 @@ class HomeViewModel(
     private fun observeFavorites() {
         wallpaperRepository.observeFavorites().map { favorites -> favorites.map { it.id }.toSet() }
             .onEach { favoriteIds ->
-                sendIntent(HomeIntent.FavoriteStatusUpdated(favoriteIds))
+                sendIntent(WallpaperListIntent.FavoriteStatusUpdated(favoriteIds))
             }.launchIn(viewModelScope)
     }
 }

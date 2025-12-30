@@ -83,7 +83,7 @@ class FavoritesViewModel(
 
             is FavoritesIntent.OnWallpaperClicked -> {
                 navigator.navigate(
-                    Destination.Detail(id = intent.wallpaper.id)
+                    Destination.WallpaperDetail(wallpaper = intent.wallpaper)
                 )
                 currentState.only()
             }

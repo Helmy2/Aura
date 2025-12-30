@@ -1,13 +1,12 @@
 import Shared
 import SwiftUI
 
-
 @main
 struct iOSApp: App {
     @StateObject private var coordinator = NavigationCoordinator()
     @State private var settingsViewModel: SettingsViewModel
     static let dependencies: DependenciesHelper = DependenciesHelper()
-    
+
     init() {
         KoinHelperKt.doInitKoin()
         settingsViewModel = SettingsViewModel()
@@ -42,8 +41,6 @@ struct ContentView: View {
                 switch coordinator.selectedTab {
                 case .home:
                     HomeNavigationStack()
-                case .videos:
-                    VideosNavigationStack()
                 case .favorites:
                     FavoritesNavigationStack()
                 case .settings:
@@ -73,12 +70,17 @@ struct HomeNavigationStack: View {
             HomeView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
-                    case .detail(let wallpaper):
-                        DetailView(
+                    case .wallpaperList:
+                        WallpaperListView()
+                    case .videoList:
+                        VideosView()
+                    case .wallpaperDetail(let wallpaper):
+                        WallpaperDetailView(
                             wallpaper: wallpaper,
                             coordinator: coordinator
                         )
-                            .toolbar(.hidden, for: .navigationBar)
+                    case .videoDetail(let video):
+                        VideoDetailView(video: video)
                     default: EmptyView()
                     }
                 }
@@ -94,8 +96,8 @@ struct FavoritesNavigationStack: View {
             FavoritesView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
-                    case .detail(let wallpaper):
-                        DetailView(
+                    case .wallpaperDetail(let wallpaper):
+                        WallpaperDetailView(
                             wallpaper: wallpaper,
                             coordinator: coordinator
                         )

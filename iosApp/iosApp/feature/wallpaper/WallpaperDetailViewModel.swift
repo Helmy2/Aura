@@ -4,9 +4,8 @@ import Observation
 import Shared
 import SwiftUI
 
-@MainActor
 @Observable
-class DetailViewModel {
+class WallpaperDetailViewModel {
     var isFavorite: Bool = false
     var downloadState: DownloadState = .idle
 

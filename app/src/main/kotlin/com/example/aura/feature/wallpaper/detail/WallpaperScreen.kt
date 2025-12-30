@@ -1,4 +1,4 @@
-package com.example.aura.feature.detail
+package com.example.aura.feature.wallpaper.detail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
@@ -40,16 +40,16 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Suppress("ParamsComparedByRef")
 @Composable
-fun DetailScreen(
+fun WallpaperScreen(
     wallpaperId: Long,
-    viewModel: DetailViewModel = koinViewModel()
+    viewModel: WallpaperViewModel = koinViewModel()
 ) {
     SystemBarStyle(isStatusBarOnDark = true, restoreOnDispose = true)
 
     val snackbarState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     DisposableEffect(Unit) {
-        viewModel.sendIntent(DetailIntent.LoadWallpaper(wallpaperId))
+        viewModel.sendIntent(WallpaperDetailIntent.LoadWallpaper(wallpaperId))
         onDispose {
 
         }
@@ -57,7 +57,7 @@ fun DetailScreen(
 
     ObserveEffect(flow = viewModel.effect) {
         when (it) {
-            is DetailEffect.ShowError -> {
+            is WallpaperDetailEffect.ShowError -> {
                 snackbarState.showSnackbar(it.message)
             }
 
@@ -109,21 +109,21 @@ fun DetailScreen(
                 contentColor = Color.White,
                 title = "Details",
                 onBackClick = {
-                    viewModel.sendIntent(DetailIntent.OnBackClicked)
+                    viewModel.sendIntent(WallpaperDetailIntent.OnBackClicked)
                 },
                 actions = {
                     state.wallpaper?.let { wallpaper ->
                         FavoriteButton(
                             isFavorite = wallpaper.isFavorite,
                             onClick = {
-                                viewModel.sendIntent(DetailIntent.ToggleFavorite(wallpaper))
+                                viewModel.sendIntent(WallpaperDetailIntent.ToggleFavorite(wallpaper))
                             },
                             tint = Color.White
                         )
 
                         IconButton(
                             onClick = {
-                                viewModel.sendIntent(DetailIntent.DownloadWallpaper)
+                                viewModel.sendIntent(WallpaperDetailIntent.DownloadWallpaper)
                             },
                             enabled = !state.isDownloading
                         ) {

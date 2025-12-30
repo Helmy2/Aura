@@ -17,15 +17,6 @@ struct AuraTabBar: View {
             Spacer()
 
             TabBarButton(
-                icon: "video.fill",
-                label: "Videos",
-                isSelected: selectedTab == .videos,
-                action: { selectedTab = .videos }
-            )
-
-            Spacer()
-
-            TabBarButton(
                 icon: "heart.fill",
                 label: "Favorites",
                 isSelected: selectedTab == .favorites,

@@ -16,12 +16,13 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.aura.feature.detail.DetailScreen
 import com.example.aura.feature.favorites.FavoritesScreen
 import com.example.aura.feature.home.HomeScreen
 import com.example.aura.feature.settings.SettingsScreen
-import com.example.aura.feature.video_detail.VideoDetailScreen
-import com.example.aura.feature.videos.VideosScreen
+import com.example.aura.feature.videos.detail.VideoDetailScreen
+import com.example.aura.feature.videos.list.VideosScreen
+import com.example.aura.feature.wallpaper.detail.WallpaperScreen
+import com.example.aura.feature.wallpaper.list.WallpaperListScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -76,20 +77,25 @@ fun MainNavHost(
                 ) {
                     HomeScreen()
                 }
+                entry<Destination.WallpaperList>(
+                    metadata = ListDetailSceneStrategy.listPane()
+                ) {
+                    WallpaperListScreen()
+                }
                 entry<Destination.Favorites>(
                     metadata = ListDetailSceneStrategy.listPane()
                 ) {
                     FavoritesScreen()
                 }
-                entry<Destination.Detail>(
+                entry<Destination.WallpaperDetail>(
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { route ->
-                    DetailScreen(route.id)
+                    WallpaperScreen(route.wallpaper.id)
                 }
                 entry<Destination.Settings> {
                     SettingsScreen()
                 }
-                entry<Destination.Videos>(
+                entry<Destination.VideoList>(
                     metadata = ListDetailSceneStrategy.listPane()
                 ) {
                     VideosScreen()
@@ -98,7 +104,7 @@ fun MainNavHost(
                 entry<Destination.VideoDetail>(
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { route ->
-                    VideoDetailScreen(route.id)
+                    VideoDetailScreen(route.video.id)
                 }
             },
         )

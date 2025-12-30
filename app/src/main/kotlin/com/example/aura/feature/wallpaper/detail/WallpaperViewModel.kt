@@ -1,17 +1,17 @@
-package com.example.aura.feature.detail
+package com.example.aura.feature.wallpaper.detail
 
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.repository.WallpaperRepository
-import com.example.aura.feature.detail.DetailEffect.ShowError
-import com.example.aura.feature.detail.DetailIntent.DownloadError
-import com.example.aura.feature.detail.DetailIntent.DownloadFinished
-import com.example.aura.feature.detail.DetailIntent.DownloadWallpaper
-import com.example.aura.feature.detail.DetailIntent.FavoriteStatusUpdated
-import com.example.aura.feature.detail.DetailIntent.LoadError
-import com.example.aura.feature.detail.DetailIntent.LoadWallpaper
-import com.example.aura.feature.detail.DetailIntent.OnBackClicked
-import com.example.aura.feature.detail.DetailIntent.ToggleFavorite
-import com.example.aura.feature.detail.DetailIntent.WallpaperLoaded
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailEffect.ShowError
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.DownloadError
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.DownloadFinished
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.DownloadWallpaper
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.FavoriteStatusUpdated
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.LoadError
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.LoadWallpaper
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.OnBackClicked
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.ToggleFavorite
+import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.WallpaperLoaded
 import com.example.aura.shared.core.mvi.MviViewModel
 import com.example.aura.shared.core.util.ImageDownloader
 import com.example.aura.shared.model.toUi
@@ -21,18 +21,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class DetailViewModel(
+class WallpaperViewModel(
     private val wallpaperRepository: WallpaperRepository,
     private val imageDownloader: ImageDownloader,
     private val navigator: AppNavigator
-) : MviViewModel<DetailState, DetailIntent, DetailEffect>(
-    initialState = DetailState()
+) : MviViewModel<WallpaperDetailState, WallpaperDetailIntent, WallpaperDetailEffect>(
+    initialState = WallpaperDetailState()
 ) {
 
     override fun reduce(
-        currentState: DetailState,
-        intent: DetailIntent
-    ): Pair<DetailState, DetailEffect?> {
+        currentState: WallpaperDetailState,
+        intent: WallpaperDetailIntent
+    ): Pair<WallpaperDetailState, WallpaperDetailEffect?> {
         return when (intent) {
             is LoadWallpaper -> {
                 loadWallpaper(intent.wallpaperId)

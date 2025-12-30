@@ -3,7 +3,7 @@ import Observation
 import Shared
 
 @Observable
-class HomeViewModel {
+class WallpaperListViewModel {
 
     // MARK: - State
     var wallpapers: [WallpaperUi] = []
@@ -38,7 +38,9 @@ class HomeViewModel {
             self.isEndReached = false
             self.isSearchMode = false
         } else {
-            guard !isPaginationLoading && !isEndReached else { return }
+            guard !isPaginationLoading && !isEndReached else {
+                return
+            }
             self.isPaginationLoading = true
         }
 
@@ -46,7 +48,9 @@ class HomeViewModel {
     }
 
     func onSearchTriggered() {
-        guard !searchQuery.isEmpty else { return }
+        guard !searchQuery.isEmpty else {
+            return
+        }
         self.isSearchMode = true
         self.isLoading = true
         self.currentPage = 1
@@ -62,7 +66,9 @@ class HomeViewModel {
     }
 
     func loadNextPage() {
-        guard !isPaginationLoading && !isEndReached else { return }
+        guard !isPaginationLoading && !isEndReached else {
+            return
+        }
         self.isPaginationLoading = true
         let nextPage = currentPage + 1
         if isSearchMode {

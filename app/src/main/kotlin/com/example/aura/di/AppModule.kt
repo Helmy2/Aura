@@ -1,11 +1,11 @@
 package com.example.aura.di
 
-import com.example.aura.feature.detail.DetailViewModel
 import com.example.aura.feature.favorites.FavoritesViewModel
-import com.example.aura.feature.home.HomeViewModel
 import com.example.aura.feature.settings.SettingsViewModel
-import com.example.aura.feature.video_detail.VideoDetailViewModel
-import com.example.aura.feature.videos.VideosViewModel
+import com.example.aura.feature.videos.detail.VideoDetailViewModel
+import com.example.aura.feature.videos.list.VideosViewModel
+import com.example.aura.feature.wallpaper.detail.WallpaperViewModel
+import com.example.aura.feature.wallpaper.list.WallpaperListViewModel
 import com.example.aura.shared.core.util.ImageDownloader
 import com.example.aura.shared.core.util.VideoDownloader
 import com.example.aura.shared.navigation.AppNavigator
@@ -25,8 +25,8 @@ val appModule = module {
         AppNavigator()
     }
 
-    viewModelOf(::HomeViewModel)
-    viewModelOf(::DetailViewModel)
+    viewModelOf(::WallpaperListViewModel)
+    viewModelOf(::WallpaperViewModel)
     viewModelOf(::FavoritesViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::VideosViewModel)

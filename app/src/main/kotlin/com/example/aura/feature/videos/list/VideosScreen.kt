@@ -1,4 +1,4 @@
-package com.example.aura.feature.videos
+package com.example.aura.feature.videos.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.aura.shared.component.AuraScaffold
 import com.example.aura.shared.component.AuraSearchBar
+import com.example.aura.shared.component.AuraTransparentTopBar
 import com.example.aura.shared.component.VideoGridCell
 import com.example.aura.shared.theme.dimens
 import org.koin.compose.viewmodel.koinViewModel
@@ -49,15 +51,11 @@ fun VideosScreen(
 
     AuraScaffold(
         topBar = {
-            AuraSearchBar(
-                query = state.searchQuery,
-                onQueryChange = { viewModel.sendIntent(VideosIntent.OnSearchQueryChanged(it)) },
-                onSearch = { viewModel.sendIntent(VideosIntent.OnSearchTriggered) },
-                onClearSearch = { viewModel.sendIntent(VideosIntent.OnClearSearch) },
-                isSearchActive = state.isSearchMode,
-                modifier = Modifier
-                    .padding(MaterialTheme.dimens.md)
-                    .padding(it)
+            AuraTransparentTopBar(
+                title = "Wallpapers",
+                onBackClick = {
+                    viewModel.sendIntent(VideosIntent.OnNavigateBack)
+                }
             )
         }) { padding ->
         Box(
@@ -78,6 +76,25 @@ fun VideosScreen(
                     verticalItemSpacing = MaterialTheme.dimens.sm,
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    item(
+                        span = StaggeredGridItemSpan.FullLine,
+                    ) {
+                        AuraSearchBar(
+                            query = state.searchQuery,
+                            onQueryChange = {
+                                viewModel.sendIntent(
+                                    VideosIntent.OnSearchQueryChanged(
+                                        it
+                                    )
+                                )
+                            },
+                            onSearch = { viewModel.sendIntent(VideosIntent.OnSearchTriggered) },
+                            onClearSearch = { viewModel.sendIntent(VideosIntent.OnClearSearch) },
+                            isSearchActive = state.isSearchMode,
+                            modifier = Modifier
+                                .padding(MaterialTheme.dimens.md),
+                        )
+                    }
                     items(videos) { video ->
                         VideoGridCell(
                             video = video,

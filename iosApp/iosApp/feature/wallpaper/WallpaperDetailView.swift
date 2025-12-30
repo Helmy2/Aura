@@ -1,16 +1,14 @@
 import Shared
 import SwiftUI
 
-struct DetailView: View {
+struct WallpaperDetailView: View {
     let wallpaper: WallpaperUi
     let coordinator: NavigationCoordinator
-    @State private var viewModel = DetailViewModel()
+    @State private var viewModel = WallpaperDetailViewModel()
 
     var body: some View {
         VStack {
-            // --- Top Bar ---
             HStack {
-                // Back Button
                 Button(action: { coordinator.pop() }) {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 20, weight: .medium))
@@ -21,7 +19,6 @@ struct DetailView: View {
 
                 Spacer()
 
-                // Favorite Button
                 Button(action: {
                     viewModel.toggleFavorite(wallpaper: wallpaper)
                 }) {

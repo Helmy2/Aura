@@ -1,6 +1,6 @@
-import SwiftUI
-import Shared
 import Observation
+import Shared
+import SwiftUI
 
 @MainActor
 class NavigationCoordinator: ObservableObject {
@@ -9,14 +9,20 @@ class NavigationCoordinator: ObservableObject {
 
     enum Tab {
         case home
-        case videos
         case favorites
         case settings
     }
 
-    // Navigate to detail
+    func navigateToWallpaperList() {
+        path.append(NavigationRoute.wallpaperList)
+    }
+
+    func navigateToVideoList() {
+        path.append(NavigationRoute.videoList)
+    }
+
     func navigateToDetail(wallpaper: WallpaperUi) {
-        path.append(NavigationRoute.detail(wallpaper))
+        path.append(NavigationRoute.wallpaperDetail(wallpaper))
     }
 
     func navigateToVideoDetail(video: VideoUi) {

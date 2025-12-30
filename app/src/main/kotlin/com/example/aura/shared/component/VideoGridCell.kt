@@ -23,11 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.example.aura.domain.model.Video
+import com.example.aura.shared.model.VideoUi
 
 @Composable
 fun VideoGridCell(
-    video: Video,
+    video: VideoUi,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

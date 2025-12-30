@@ -1,95 +1,62 @@
-import Shared
 import SwiftUI
 
 struct HomeView: View {
-    @State private var viewModel = HomeViewModel()
     @EnvironmentObject var coordinator: NavigationCoordinator
 
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible()),
-    ]
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Aura")
+                .font(.system(size: 40, weight: .bold, design: .rounded))
+                .padding(.top, 40)
+
+            Text("Discover visual perfection")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+                .padding(.bottom, 20)
+
+
+            Button(action: { coordinator.navigateToWallpaperList() }) {
+                MenuCard(title: "Wallpapers", icon: "photo.on.rectangle.angled", color: .purple)
+            }
+
+            Button(action: { coordinator.navigateToVideoList() }) {
+                MenuCard(title: "Videos", icon: "play.rectangle.fill", color: .blue)
+            }
+
+            Spacer()
+        }
+        .padding()
+        .navigationBarHidden(true)
+    }
+}
+
+struct MenuCard: View {
+    let title: String
+    let icon: String
+    let color: Color
 
     var body: some View {
-        content
-            .navigationBarHidden(true)
-            .onAppear {
-                if viewModel.wallpapers.isEmpty && !viewModel.isLoading {
-                    viewModel.loadCuratedWallpapers(reset: true)
-                }
-            }
-    }
+        HStack {
+            Image(systemName: icon)
+                .font(.system(size: 30))
+                .foregroundColor(.white)
+                .frame(width: 60, height: 60)
+                .background(color.opacity(0.8))
+                .clipShape(Circle())
 
-    // MARK: - Subviews
-    private var content: some View {
-        VStack(spacing: 0) {
-            searchBarSection
+            Text(title)
+                .font(.title2)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
 
-            if viewModel.isLoading && viewModel.wallpapers.isEmpty {
-                loadingSpinner
-            } else {
-                wallpaperGridScrollView
-            }
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundColor(.gray)
         }
-    }
-
-    private var searchBarSection: some View {
-        SearchBarView(
-            text: $viewModel.searchQuery,
-            isSearchActive: viewModel.isSearchMode,
-            onSearch: { viewModel.onSearchTriggered() },
-            onClear: { viewModel.onClearSearch() }
-        )
-        .padding(.horizontal)
-        .padding(.top, 8)
-        .padding(.bottom, 8)
-    }
-
-    private var loadingSpinner: some View {
-        ProgressView()
-            .scaleEffect(1.5)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var wallpaperGridScrollView: some View {
-        ScrollView {
-            wallpaperGrid
-                .padding(.horizontal)
-                .padding(.top, 8)
-        }
-    }
-
-    private var wallpaperGrid: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
-            let list =
-                viewModel.isSearchMode
-                    ? viewModel.searchWallpapers : viewModel.wallpapers
-            ForEach(list, id: \.id) { wallpaper in
-                WallpaperGridCell(
-                    wallpaper: wallpaper,
-                    onTap: {
-                        coordinator.navigateToDetail(wallpaper: wallpaper)
-                    },
-                    onFavoriteToggle: {
-                        viewModel.toggleFavorite(wallpaper: wallpaper)
-                    }
-                )
-                .onAppear {
-                    if wallpaper == list.last {
-                        viewModel.loadNextPage()
-                    }
-                }
-            }
-
-            if viewModel.isPaginationLoading {
-                paginationLoader
-            }
-        }
-    }
-
-    private var paginationLoader: some View {
-        ProgressView()
-            .frame(maxWidth: .infinity)
-            .padding()
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(20)
+        .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
     }
 }

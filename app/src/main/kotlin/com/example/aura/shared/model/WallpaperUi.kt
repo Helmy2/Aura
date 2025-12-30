@@ -2,9 +2,11 @@ package com.example.aura.shared.model
 
 import androidx.compose.runtime.Immutable
 import com.example.aura.domain.model.Wallpaper
+import kotlinx.serialization.Serializable
 
 
 @Immutable
+@Serializable
 data class WallpaperUi(
     val id: Long,
     val imageUrl: String,

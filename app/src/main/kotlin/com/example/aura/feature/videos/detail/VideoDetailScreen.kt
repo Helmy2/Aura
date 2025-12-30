@@ -1,4 +1,4 @@
-package com.example.aura.feature.video_detail
+package com.example.aura.feature.videos.detail
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility

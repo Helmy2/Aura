@@ -1,4 +1,4 @@
-package com.example.aura.feature.video_detail
+package com.example.aura.feature.videos.detail
 
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.model.Video

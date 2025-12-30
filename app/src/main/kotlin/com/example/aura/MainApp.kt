@@ -1,6 +1,7 @@
 package com.example.aura
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
@@ -55,7 +56,9 @@ fun MainApp(modifier: Modifier = Modifier) {
     SystemBarStyle(isStatusBarOnDark = darkTheme)
 
     AuraTheme(darkTheme = darkTheme) {
-        MainNavHost(shouldShowNavigationBar, navController, modifier)
+        Surface {
+            MainNavHost(shouldShowNavigationBar, navController, modifier)
+        }
     }
 }
 
