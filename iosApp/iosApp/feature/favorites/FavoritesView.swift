@@ -3,8 +3,8 @@ import SwiftUI
 
 struct FavoritesView: View {
     @State private var viewModel = FavoritesViewModel()
-    let coordinator: NavigationCoordinator
-
+    @EnvironmentObject var coordinator: NavigationCoordinator
+    
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),

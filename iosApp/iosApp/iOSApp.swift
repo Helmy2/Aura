@@ -1,10 +1,13 @@
 import Shared
 import SwiftUI
 
+
 @main
 struct iOSApp: App {
+    @StateObject private var coordinator = NavigationCoordinator()
     @State private var settingsViewModel: SettingsViewModel
-
+    static let dependencies: DependenciesHelper = DependenciesHelper()
+    
     init() {
         KoinHelperKt.doInitKoin()
         settingsViewModel = SettingsViewModel()
@@ -13,6 +16,7 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(coordinator)
                 .preferredColorScheme(
                     getColorScheme(for: settingsViewModel.themeMode)
                 )
@@ -29,7 +33,7 @@ struct iOSApp: App {
 }
 
 struct ContentView: View {
-    @State private var coordinator = NavigationCoordinator()
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -37,13 +41,13 @@ struct ContentView: View {
             Group {
                 switch coordinator.selectedTab {
                 case .home:
-                    HomeNavigationStack(coordinator: coordinator)
+                    HomeNavigationStack()
                 case .videos:
-                    VideosNavigationStack(coordinator: coordinator)
+                    VideosNavigationStack()
                 case .favorites:
-                    FavoritesNavigationStack(coordinator: coordinator)
+                    FavoritesNavigationStack()
                 case .settings:
-                    SettingNavigationStack(coordinator: coordinator)
+                    SettingNavigationStack()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -62,11 +66,11 @@ struct ContentView: View {
 // MARK: - Navigation Stacks
 
 struct HomeNavigationStack: View {
-    @Bindable var coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            HomeView(coordinator: coordinator)
+            HomeView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
                     case .detail(let wallpaper):
@@ -83,11 +87,11 @@ struct HomeNavigationStack: View {
 }
 
 struct FavoritesNavigationStack: View {
-    @Bindable var coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            FavoritesView(coordinator: coordinator)
+            FavoritesView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
                     case .detail(let wallpaper):
@@ -104,7 +108,7 @@ struct FavoritesNavigationStack: View {
 }
 
 struct SettingNavigationStack: View {
-    @Bindable var coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
@@ -114,11 +118,11 @@ struct SettingNavigationStack: View {
 }
 
 struct VideosNavigationStack: View {
-    @Bindable var coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            VideosView(coordinator: coordinator)
+            VideosView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
                     case .videoDetail(let video):

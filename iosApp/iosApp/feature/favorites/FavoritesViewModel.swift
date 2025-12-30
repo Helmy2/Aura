@@ -15,7 +15,7 @@ class FavoritesViewModel {
     private var observationTask: Task<Void, Never>? = nil
 
     init() {
-        self.repository = KoinHelper().wallpaperRepository
+        self.repository = iOSApp.dependencies.wallpaperRepository
     }
 
     // MARK: - Lifecycle

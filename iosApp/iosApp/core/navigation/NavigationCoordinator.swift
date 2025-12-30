@@ -1,19 +1,11 @@
-//
-//  NavigationCoordinator.swift
-//  iosApp
-//
-//  Created by platinum on 27/12/2025.
-//
-
 import SwiftUI
 import Shared
 import Observation
 
 @MainActor
-@Observable
-class NavigationCoordinator {
-    var path = NavigationPath()
-    var selectedTab: Tab = .home
+class NavigationCoordinator: ObservableObject {
+    @Published var path = NavigationPath()
+    @Published var selectedTab: Tab = .home
 
     enum Tab {
         case home
@@ -48,6 +40,4 @@ class NavigationCoordinator {
         selectedTab = tab
         popToRoot()
     }
-
-
 }

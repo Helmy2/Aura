@@ -1,6 +1,6 @@
+import Combine
 import Foundation
 import Shared
-import Combine
 
 @MainActor
 class VideosViewModel: ObservableObject {
@@ -23,12 +23,7 @@ class VideosViewModel: ObservableObject {
     private let repository: VideoRepository
 
     init() {
-        self.repository = KoinHelper().videoRepository
-
-        // Initial Load
-        Task {
-            await loadPopularVideos(reset: true)
-        }
+        self.repository = iOSApp.dependencies.videoRepository
     }
 
     // MARK: - Intents
@@ -66,8 +61,7 @@ class VideosViewModel: ObservableObject {
     func onClearSearch() {
         self.isSearchMode = false
         self.searchQuery = ""
-        self.isEndReached = false // Reset for popular flow if needed, or keep previous state
-        // Ideally we revert to popular state without reloading if it was already loaded
+        self.isEndReached = false
     }
 
     func loadNextPage() {
@@ -91,9 +85,14 @@ class VideosViewModel: ObservableObject {
             do {
                 let result: [Video]
                 if let query = query, isSearch {
-                    result = try await repository.searchVideos(query: query, page: Int32(page))
+                    result = try await repository.searchVideos(
+                        query: query,
+                        page: Int32(page)
+                    )
                 } else {
-                    result = try await repository.getPopularVideos(page: Int32(page))
+                    result = try await repository.getPopularVideos(
+                        page: Int32(page)
+                    )
                 }
 
                 if result.isEmpty {
@@ -110,9 +109,11 @@ class VideosViewModel: ObservableObject {
                             self.searchVideos = uiResults
                         } else {
                             // Deduplicate
-                            let existingIds = Set(self.searchVideos.map {
-                                $0.id
-                            })
+                            let existingIds = Set(
+                                self.searchVideos.map {
+                                    $0.id
+                                }
+                            )
                             let newUnique = uiResults.filter {
                                 !existingIds.contains($0.id)
                             }
@@ -122,9 +123,11 @@ class VideosViewModel: ObservableObject {
                         if page == 1 {
                             self.popularVideos = uiResults
                         } else {
-                            let existingIds = Set(self.popularVideos.map {
-                                $0.id
-                            })
+                            let existingIds = Set(
+                                self.popularVideos.map {
+                                    $0.id
+                                }
+                            )
                             let newUnique = uiResults.filter {
                                 !existingIds.contains($0.id)
                             }

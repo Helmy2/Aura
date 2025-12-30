@@ -13,7 +13,7 @@ class SettingsViewModel {
     var errorMessage: String?
 
     init() {
-        self.repository = KoinHelper().settingsRepository
+        self.repository = iOSApp.dependencies.settingsRepository
         observeThemeMode()
     }
 

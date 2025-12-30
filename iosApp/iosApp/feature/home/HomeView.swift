@@ -3,7 +3,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel = HomeViewModel()
-    let coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     private let columns = [
         GridItem(.flexible()),

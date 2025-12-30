@@ -3,7 +3,7 @@ import Shared
 
 struct VideosView: View {
     @StateObject private var viewModel = VideosViewModel()
-    let coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     private let columns = [
         GridItem(.flexible()),
@@ -12,7 +12,6 @@ struct VideosView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Search Bar
             SearchBarView(
                 text: $viewModel.searchQuery,
                 isSearchActive: viewModel.isSearchMode,
@@ -22,7 +21,6 @@ struct VideosView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 8)
 
-            // Content
             if viewModel.isLoading && (viewModel.isSearchMode ? viewModel.searchVideos.isEmpty : viewModel.popularVideos.isEmpty) {
                 ProgressView()
                     .scaleEffect(1.5)
@@ -57,6 +55,9 @@ struct VideosView: View {
             }
         }
         .navigationBarHidden(true)
+        .onAppear {
+            viewModel.loadPopularVideos(reset: true)
+        }
     }
 }
 

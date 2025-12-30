@@ -25,7 +25,7 @@ class HomeViewModel {
     private var favoritesTask: Task<Void, Never>? = nil
 
     init() {
-        self.repository = KoinHelper().wallpaperRepository
+        self.repository = iOSApp.dependencies.wallpaperRepository
         observeFavorites()
     }
 
