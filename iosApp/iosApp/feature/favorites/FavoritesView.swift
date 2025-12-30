@@ -3,8 +3,8 @@ import SwiftUI
 
 struct FavoritesView: View {
     @State private var viewModel = FavoritesViewModel()
-    let coordinator: NavigationCoordinator
-
+    @EnvironmentObject var coordinator: NavigationCoordinator
+    
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),
@@ -12,8 +12,12 @@ struct FavoritesView: View {
 
     var body: some View {
         content
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.large)
+        .onAppear {
+            viewModel.startObserving()
+        }
+        .onDisappear {
+            viewModel.stopObserving()
+        }
     }
 
     // MARK: - Subviews

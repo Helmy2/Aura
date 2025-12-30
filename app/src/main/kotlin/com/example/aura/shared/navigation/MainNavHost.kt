@@ -19,7 +19,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.aura.feature.detail.DetailScreen
 import com.example.aura.feature.favorites.FavoritesScreen
 import com.example.aura.feature.home.HomeScreen
-import com.example.aura.navigation.bottomNavItems
+import com.example.aura.feature.settings.SettingsScreen
+import com.example.aura.feature.video_detail.VideoDetailScreen
+import com.example.aura.feature.videos.VideosScreen
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -83,6 +85,20 @@ fun MainNavHost(
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { route ->
                     DetailScreen(route.id)
+                }
+                entry<Destination.Settings> {
+                    SettingsScreen()
+                }
+                entry<Destination.Videos>(
+                    metadata = ListDetailSceneStrategy.listPane()
+                ) {
+                    VideosScreen()
+                }
+
+                entry<Destination.VideoDetail>(
+                    metadata = ListDetailSceneStrategy.detailPane()
+                ) { route ->
+                    VideoDetailScreen(route.id)
                 }
             },
         )

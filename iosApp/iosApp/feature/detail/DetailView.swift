@@ -7,132 +7,141 @@ struct DetailView: View {
     @State private var viewModel = DetailViewModel()
 
     var body: some View {
-        ZStack {
-            Color(hex: wallpaper.averageColor)
-
-            AsyncImage(url: URL(string: wallpaper.imageUrl)) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                case .empty:
-                    ProgressView()
-                default:
-                    Color.black
-                }
-            }
-
-            // Top Bar with Back, Favorite and Download
-            VStack {
-                HStack {
-                    // Back Button
-                    Button(action: {
-                        coordinator.pop()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .font(.title3)
-                            .foregroundStyle(.white)
-                            .padding(8)
-                            .background(.ultraThinMaterial, in: Circle())
-                    }
-
-                    Spacer()
-
-                    // Favorite Button
-                    FavoriteButton(
-                        isFavorite: viewModel.isFavorite,
-                        action: {
-                            viewModel.toggleFavorite(wallpaper: wallpaper)
-                        }
-                    )
-
-                    // Download Button
-                    Button(action: {
-                        viewModel.downloadWallpaper(url: wallpaper.imageUrl)
-                    }) {
-                        ZStack {
-                            if viewModel.isDownloading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .frame(width: 20, height: 20)
-                            } else {
-                                Image(systemName: "arrow.down.circle.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .padding(8)
+        VStack {
+            // --- Top Bar ---
+            HStack {
+                // Back Button
+                Button(action: { coordinator.pop() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(12)
                         .background(.ultraThinMaterial, in: Circle())
-                    }
-                    .disabled(viewModel.isDownloading)
                 }
-                .padding(.horizontal)
-                .padding(.top, getSafeAreaTop() + 8)
 
                 Spacer()
-            }
-            
-            // Scrim & Metadata Overlay
-            VStack {
-                Spacer()
-                ZStack(alignment: .bottom) {
-                    LinearGradient(
-                        colors: [.black.opacity(0.8), .clear],
-                        startPoint: .bottom,
-                        endPoint: .top
+
+                // Favorite Button
+                Button(action: {
+                    viewModel.toggleFavorite(wallpaper: wallpaper)
+                }) {
+                    Image(
+                        systemName: viewModel.isFavorite
+                            ? "heart.fill" : "heart"
                     )
-                    .frame(height: 160)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(viewModel.isFavorite ? .red : .white)
+                        .padding(12)
+                        .background(.ultraThinMaterial, in: Circle())
+                }
 
+                Button(action: {
+                    viewModel.downloadWallpaper(url: wallpaper.imageUrl)
+                }) {
+                    ZStack {
+                        switch viewModel.downloadState {
+
+                        case .idle:
+                            Image(systemName: "arrow.down")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundStyle(.white)
+                                .transition(.scale.combined(with: .opacity))
+                                .scaledToFill()
+
+                        case .downloading:
+                            ProgressView()
+                                .tint(.white)
+                                .scaleEffect(0.8)
+                                .transition(.scale.combined(with: .opacity))
+
+                        case .success:
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(.green)
+                                .transition(.scale.combined(with: .opacity))
+
+                        case .failed:
+                            Image(systemName: "xmark")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(.red)
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                    .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
+                    .overlay(
+                        Circle().stroke(
+                            borderColor(for: viewModel.downloadState),
+                            lineWidth: 2
+                        )
+                    )
+                    .animation(
+                        .spring(response: 0.3, dampingFraction: 0.6),
+                        value: viewModel.downloadState
+                    )
+                }
+                .disabled(viewModel.downloadState != .idle)
+
+            }
+            .padding(.horizontal)
+
+            Spacer()
+
+            // --- Bottom Metadata Bar ---
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(wallpaper.photographerName)
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .padding(.bottom, getSafeAreaBottom() + 20)
+                        .font(.title3)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white)
+
+                    Text("Photographer")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+                .padding()
+
+                Spacer()
+
+                Image(systemName: "camera.fill")
+                    .foregroundStyle(.white.opacity(0.6))
+                    .padding()
+            }
+            .background(.ultraThinMaterial)
+        }
+        .background(
+            ZStack {
+                Color(hex: wallpaper.averageColor)
+
+                AsyncImage(url: URL(string: wallpaper.imageUrl)) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .empty:
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(.white)
+                    default:
+                        Color.clear
+                    }
                 }
             }
-        }
+            .ignoresSafeArea()
+        )
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .tabBar)
-        .ignoresSafeArea()
         .onAppear {
             viewModel.loadFavoriteStatus(wallpaperId: wallpaper.id)
         }
     }
-
-    // MARK: - Safe Area Helpers
-    private func getSafeAreaTop() -> CGFloat {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow })
-        else {
-            return 0
-        }
-        return window.safeAreaInsets.top
-    }
-
-    private func getSafeAreaBottom() -> CGFloat {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first(where: { $0.isKeyWindow })
-        else {
-            return 0
-        }
-        return window.safeAreaInsets.bottom
-    }
 }
 
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(
-            in: CharacterSet.alphanumerics.inverted
-        )
-
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let r = Double((int >> 16) & 0xFF) / 255
-        let g = Double((int >> 8) & 0xFF) / 255
-        let b = Double(int & 0xFF) / 255
-        self.init(red: r, green: g, blue: b)
+private func borderColor(for state: DownloadState) -> Color {
+    switch state {
+    case .success: return .green.opacity(0.8)
+    case .failed: return .red.opacity(0.8)
+    default: return .clear
     }
 }

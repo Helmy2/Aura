@@ -4,7 +4,8 @@ android-compileSdk = "36"
 android-minSdk = "31"
 android-targetSdk = "36"
 datastorePreferences = "1.2.0"
-kotlin = "2.3.0"
+kotlin = "2.2.21"
+skie = "0.10.8"
 activityCompose = "1.12.2"
 koin = "4.1.1"
 sqldelight = "2.2.1"
@@ -27,6 +28,7 @@ composeBom = "2025.12.01"
 
 kotlinxSerializationJson = "1.9.0"
 material3AdaptiveNavigationSuite = "1.4.0"
+media3 = "1.9.0"
 
 [libraries]
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
@@ -81,6 +83,9 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuite" }
 
+media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+media3-exoplayer-dash = { group = "androidx.media3", name = "media3-exoplayer-dash", version.ref = "media3" }
+media3-ui-compose = { group = "androidx.media3", name = "media3-ui-compose", version.ref = "media3" }
 
 [bundles]
 coil = ["coil-compose", "coil-compose-core", "coil-network-ktor3"]
@@ -99,6 +104,11 @@ nav3 = [
     "androidx-lifecycle-viewmodel-navigation3",
     "androidx-material3-adaptive-navigation3"
 ]
+media3 = [
+    "media3-exoplayer",
+    "media3-exoplayer-dash",
+    "media3-ui-compose"
+]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -107,6 +117,7 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 mokkery = { id = "dev.mokkery", version.ref = "mokkery" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+skie = { id = "co.touchlab.skie", version.ref = "skie" }
 
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

@@ -1,10 +1,4 @@
-//
-//  WallpaperGridCell.swift
-//  iosApp
-//
-//  Created by platinum on 27/12/2025.
-//
-
+import Shared
 import SwiftUI
 
 struct WallpaperGridCell: View {
@@ -13,7 +7,7 @@ struct WallpaperGridCell: View {
     var onFavoriteToggle: (() -> Void)? = nil
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .bottom) {
 
             Button(action: onTap) {
                 AsyncImage(url: URL(string: wallpaper.smallImageUrl)) { phase in
@@ -35,15 +29,36 @@ struct WallpaperGridCell: View {
                 .clipped()
             }
 
-            // Favorite Button
-            FavoriteButton(
-                isFavorite: wallpaper.isFavorite,
-                action: {
-                    onFavoriteToggle?()
-                }
-            )
-            .padding(8)
 
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(wallpaper.photographerName)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .shadow(radius: 2)
+                }
+
+                Spacer()
+
+                Button(action: {
+                    onFavoriteToggle?()
+                }) {
+                    Image(
+                        systemName: wallpaper.isFavorite
+                            ? "heart.fill" : "heart"
+                    )
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(wallpaper.isFavorite ? .red : .white)
+                        .shadow(radius: 2)
+                }
+            }
+            .padding(10)
+            .background(.ultraThinMaterial)
+            .environment(\.colorScheme, .dark)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
     }
 }

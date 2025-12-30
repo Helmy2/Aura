@@ -1,75 +1,135 @@
-import SwiftUI
 import Shared
+import SwiftUI
+
 
 @main
 struct iOSApp: App {
+    @StateObject private var coordinator = NavigationCoordinator()
+    @State private var settingsViewModel: SettingsViewModel
+    static let dependencies: DependenciesHelper = DependenciesHelper()
+    
     init() {
         KoinHelperKt.doInitKoin()
+        settingsViewModel = SettingsViewModel()
     }
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(coordinator)
+                .preferredColorScheme(
+                    getColorScheme(for: settingsViewModel.themeMode)
+                )
+        }
+    }
+
+    private func getColorScheme(for mode: ThemeMode) -> ColorScheme? {
+        switch mode {
+        case .system: return nil
+        case .light: return .light
+        case .dark: return .dark
         }
     }
 }
 
 struct ContentView: View {
-    @State private var coordinator = NavigationCoordinator()
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
-        TabView(selection: Binding(
-            get: { coordinator.selectedTab },
-            set: { coordinator.switchToTab($0) }
-        )) {
-            HomeNavigationStack(coordinator: coordinator)
-            .tabItem {
-                Label("Home", systemImage: coordinator.selectedTab == .home ? "house.fill" : "house")
-            }
-            .tag(NavigationCoordinator.Tab.home)
+        ZStack(alignment: .bottom) {
 
-            FavoritesNavigationStack(coordinator: coordinator)
-            .tabItem {
-                Label("Favorites", systemImage: coordinator.selectedTab == .favorites ? "heart.fill" : "heart")
+            Group {
+                switch coordinator.selectedTab {
+                case .home:
+                    HomeNavigationStack()
+                case .videos:
+                    VideosNavigationStack()
+                case .favorites:
+                    FavoritesNavigationStack()
+                case .settings:
+                    SettingNavigationStack()
+                }
             }
-            .tag(NavigationCoordinator.Tab.favorites)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            if coordinator.path.isEmpty {
+                AuraTabBar(selectedTab: $coordinator.selectedTab)
+                    .padding(.bottom, 10)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+
+            }
         }
-        .tint(.pink)
+        .ignoresSafeArea()
     }
 }
 
-// MARK: - Home Navigation Stack
+// MARK: - Navigation Stacks
+
 struct HomeNavigationStack: View {
-    @Bindable var coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            HomeView(coordinator: coordinator)
+            HomeView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
                     case .detail(let wallpaper):
-                        DetailView(wallpaper: wallpaper, coordinator: coordinator)
-                    default:
-                        EmptyView()
+                        DetailView(
+                            wallpaper: wallpaper,
+                            coordinator: coordinator
+                        )
+                            .toolbar(.hidden, for: .navigationBar)
+                    default: EmptyView()
                     }
                 }
         }
     }
 }
 
-// MARK: - Favorites Navigation Stack
 struct FavoritesNavigationStack: View {
-    @Bindable var coordinator: NavigationCoordinator
+    @EnvironmentObject var coordinator: NavigationCoordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            FavoritesView(coordinator: coordinator)
+            FavoritesView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
                     case .detail(let wallpaper):
-                        DetailView(wallpaper: wallpaper, coordinator: coordinator)
-                    default:
-                        EmptyView()
+                        DetailView(
+                            wallpaper: wallpaper,
+                            coordinator: coordinator
+                        )
+                            .toolbar(.hidden, for: .navigationBar)
+                    default: EmptyView()
+                    }
+                }
+        }
+    }
+}
+
+struct SettingNavigationStack: View {
+    @EnvironmentObject var coordinator: NavigationCoordinator
+
+    var body: some View {
+        NavigationStack(path: $coordinator.path) {
+            SettingsView()
+        }
+    }
+}
+
+struct VideosNavigationStack: View {
+    @EnvironmentObject var coordinator: NavigationCoordinator
+
+    var body: some View {
+        NavigationStack(path: $coordinator.path) {
+            VideosView()
+                .navigationDestination(for: NavigationRoute.self) { route in
+                    switch route {
+                    case .videoDetail(let video):
+                        VideoDetailView(
+                            video: video
+                        ).toolbar(.hidden, for: .navigationBar)
+                    default: EmptyView()
                     }
                 }
         }

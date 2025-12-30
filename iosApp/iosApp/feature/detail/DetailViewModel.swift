@@ -1,29 +1,28 @@
 import Foundation
-import SwiftUI
+import Photos
 import Observation
 import Shared
+import SwiftUI
 
 @MainActor
 @Observable
 class DetailViewModel {
-    var isDownloading: Bool = false
-    var showToast: Bool = false
-    var toastMessage: String = ""
     var isFavorite: Bool = false
-    
-    private let downloader = ImageDownloader()
+    var downloadState: DownloadState = .idle
+
     private let repository: WallpaperRepository
-    
+
     init() {
-        self.repository = KoinHelper().wallpaperRepository
+        self.repository = iOSApp.dependencies.wallpaperRepository
     }
 
     func loadFavoriteStatus(wallpaperId: Int64) {
         Task {
             do {
-                self.isFavorite = try await repository.isFavorite(wallpaperId: wallpaperId).boolValue
+                self.isFavorite = try await repository.isFavorite(
+                    wallpaperId: wallpaperId
+                ).boolValue
             } catch {
-                // Silent fail
                 print("Failed to load favorite status: \(error)")
             }
         }
@@ -35,23 +34,83 @@ class DetailViewModel {
                 let kmWallpaper = wallpaper.toDomain()
                 try await repository.toggleFavorite(wallpaper: kmWallpaper)
                 self.isFavorite.toggle()
-                self.toastMessage = isFavorite ? "Added to favorites" : "Removed from favorites"
-                self.showToast = true
-            } catch {
-                self.toastMessage = "Failed to update favorite"
-                self.showToast = true
             }
         }
     }
-    
+
     func downloadWallpaper(url: String) {
-        guard !isDownloading else { return }
-        self.isDownloading = true
         Task {
-            let success = await downloader.downloadAndSave(url: url)
-            self.isDownloading = false
-            self.toastMessage = success ? "Saved to Photos" : "Save Failed"
-            self.showToast = true
+            downloadState = .downloading
+
+            do {
+                try await downloadAndSave(url: url)
+
+                downloadState = .success
+                triggerHaptic(type: .success)
+
+                try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                downloadState = .idle
+
+            } catch {
+                print("Download failed: \(error.localizedDescription)")
+                downloadState = .failed
+                triggerHaptic(type: .error)
+
+                try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                downloadState = .idle
+            }
+        }
+    }
+
+    private func triggerHaptic(
+        type: UINotificationFeedbackGenerator.FeedbackType
+    ) {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(type)
+    }
+
+    func downloadAndSave(url: String) async throws {
+        guard let imageUrl = URL(string: url) else {
+            throw URLError(.badURL)
+        }
+
+        let (data, _) = try await URLSession.shared.data(from: imageUrl)
+
+        guard let image = UIImage(data: data) else {
+            throw URLError(.cannotDecodeContentData)
+        }
+
+        try await saveToPhotoLibrary(image)
+    }
+
+    private func saveToPhotoLibrary(_ image: UIImage) async throws {
+        let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+
+        guard status == .authorized || status == .limited else {
+            throw ImageDownloadError.permissionDenied
+        }
+
+        try await PHPhotoLibrary.shared().performChanges {
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+        }
+    }
+}
+
+enum DownloadState {
+    case idle
+    case downloading
+    case success
+    case failed
+}
+
+enum ImageDownloadError: Error, LocalizedError {
+    case permissionDenied
+    case saveFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .permissionDenied: return "Photo library access denied. Please enable it in Settings."
+        case .saveFailed: return "Failed to save photo."
         }
     }
 }

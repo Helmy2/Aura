@@ -1,80 +1,56 @@
 import Foundation
-import Shared
 import Observation
+import Shared
 
 @Observable
 class FavoritesViewModel {
+
     // MARK: - State
     var favorites: [WallpaperUi] = []
     var isLoading: Bool = true
     var errorMessage: String? = nil
-    var showToast: Bool = false
-    var toastMessage: String = ""
 
-    // Dependencies
     private let repository: WallpaperRepository
-    
+
+    private var observationTask: Task<Void, Never>? = nil
+
     init() {
-        self.repository = KoinHelper().wallpaperRepository
-        observeFavorites()
+        self.repository = iOSApp.dependencies.wallpaperRepository
+    }
+
+    // MARK: - Lifecycle
+
+    func startObserving() {
+        stopObserving()
+
+        isLoading = true
+
+        observationTask = Task { @MainActor in
+            for await wallpapers in repository.observeFavorites() {
+                let uiList = wallpapers.map {
+                    $0.toUi()
+                }
+
+                self.favorites = uiList
+                self.isLoading = false
+            }
+        }
+    }
+
+    func stopObserving() {
+        observationTask?.cancel()
+        observationTask = nil
     }
 
     // MARK: - Intents
+
     func removeFavorite(wallpaper: WallpaperUi) {
         Task {
             do {
                 try await repository.removeFavorite(wallpaperId: wallpaper.id)
-                self.toastMessage = "Removed from favorites"
-                self.showToast = true
             } catch {
                 self.errorMessage = error.localizedDescription
-                self.toastMessage = "Failed to remove favorite"
-                self.showToast = true
             }
         }
-    }
-
-    func clearAllFavorites() {
-        Task {
-            do {
-                for favorite in favorites {
-                    try await repository.removeFavorite(wallpaperId: favorite.id)
-                }
-                self.toastMessage = "All favorites cleared"
-                self.showToast = true
-            } catch {
-                self.errorMessage = error.localizedDescription
-                self.toastMessage = "Failed to clear favorites"
-                self.showToast = true
-            }
-        }
-    }
-
-    // MARK: - Private Logic
-    private func observeFavorites() {
-        repository.observeFavorites().collect(
-            collector: Collector<[Wallpaper]> { [weak self] wallpapers in
-                guard let self = self else {
-                    return
-                }
-                Task { @MainActor in
-                    self.favorites = wallpapers.map {
-                        $0.toUi(isFavorite: true)
-                    }
-                    self.isLoading = false
-                }
-            },
-            completionHandler: { [weak self] error in
-                guard let self = self else {
-                    return
-                }
-                Task { @MainActor in
-                    if let error = error {
-                        self.errorMessage = error.localizedDescription
-                    }
-                    self.isLoading = false
-                }
-            }
-        )
     }
 }

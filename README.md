@@ -210,7 +210,7 @@ Aura intelligently switches between two modes:
 - [x] MVI architecture implementation
 - [x] Native UI for both platforms (Compose & SwiftUI)
 - [x] Settings screen (Theme selection)
-- [x] Video support (Android & iOS)
+- [x] Video support
 
 ### 🚧 In Progress / Planned
 

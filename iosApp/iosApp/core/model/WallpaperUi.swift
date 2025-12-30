@@ -19,19 +19,23 @@ struct WallpaperUi: Identifiable, Equatable, Hashable {
     let height: Int
     let width: Int
     var isFavorite: Bool
-
-    // Equatable conformance
-    static func ==(lhs: WallpaperUi, rhs: WallpaperUi) -> Bool {
-        return lhs.id == rhs.id
-    }
-
-    // Hashable conformance
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
 }
 
 extension WallpaperUi {
+    func copy(isFavorite: Bool? = nil) -> WallpaperUi {
+        return WallpaperUi(
+            id: self.id,
+            imageUrl: self.imageUrl,
+            smallImageUrl: self.smallImageUrl,
+            photographerName: self.photographerName,
+            photographerUrl: self.photographerUrl,
+            averageColor: self.averageColor,
+            height: self.height,
+            width: self.width,
+            isFavorite: isFavorite ?? self.isFavorite
+        )
+    }
+
     func toDomain() -> Wallpaper {
         return Wallpaper(
             id: self.id,
@@ -48,7 +52,7 @@ extension WallpaperUi {
 }
 
 extension Wallpaper {
-    func toUi(isFavorite: Bool) -> WallpaperUi {
+    func toUi() -> WallpaperUi {
         return WallpaperUi(
             id: self.id,
             imageUrl: self.imageUrl,
@@ -58,7 +62,7 @@ extension Wallpaper {
             averageColor: self.averageColor,
             height: Int(self.height),
             width: Int(self.width),
-            isFavorite: isFavorite
+            isFavorite: self.isFavorite
         )
     }
 }

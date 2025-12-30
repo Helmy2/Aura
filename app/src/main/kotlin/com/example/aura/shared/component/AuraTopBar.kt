@@ -14,12 +14,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuraTransparentTopBar(
     title: String,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentColor: Color = MaterialTheme.colorScheme.onBackground,
+    actions: @Composable RowScope.() -> Unit = {}
+) {
+    AuraTransparentTopBar(
+        title = title,
+        modifier = modifier,
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = contentColor
+                )
+            }
+        },
+        contentColor = contentColor,
+        actions = actions,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AuraTransparentTopBar(
+    title: String,
+    modifier: Modifier = Modifier,
+    contentColor: Color = MaterialTheme.colorScheme.onBackground,
+    navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
@@ -28,18 +54,10 @@ fun AuraTransparentTopBar(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
-                color = Color.White
+                color = contentColor
             )
         },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.White
-                )
-            }
-        },
+        navigationIcon = navigationIcon,
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,

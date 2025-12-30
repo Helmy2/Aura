@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.skie)
 }
 
 kotlin {
@@ -30,6 +31,7 @@ kotlin {
             implementation(libs.bundles.ktor)
             implementation(libs.ktor.client.logging)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.androidx.datastore.preferences)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)

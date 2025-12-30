@@ -32,6 +32,7 @@ import com.example.aura.shared.component.AuraImage
 import com.example.aura.shared.component.AuraScaffold
 import com.example.aura.shared.component.AuraTransparentTopBar
 import com.example.aura.shared.component.FavoriteButton
+import com.example.aura.shared.component.SystemBarStyle
 import com.example.aura.shared.core.extensions.ObserveEffect
 import com.example.aura.shared.core.extensions.toColor
 import com.example.aura.shared.theme.dimens
@@ -43,6 +44,8 @@ fun DetailScreen(
     wallpaperId: Long,
     viewModel: DetailViewModel = koinViewModel()
 ) {
+    SystemBarStyle(isStatusBarOnDark = true, restoreOnDispose = true)
+
     val snackbarState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     DisposableEffect(Unit) {
@@ -65,7 +68,6 @@ fun DetailScreen(
     }
 
     AuraScaffold(
-        isStatusBarOnDark = true,
         snackbarHost = {
             SnackbarHost(
                 snackbarState,
@@ -104,6 +106,7 @@ fun DetailScreen(
                     )
             )
             AuraTransparentTopBar(
+                contentColor = Color.White,
                 title = "Details",
                 onBackClick = {
                     viewModel.sendIntent(DetailIntent.OnBackClicked)
