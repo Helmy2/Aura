@@ -164,6 +164,12 @@ Aura intelligently switches between two modes:
 - **Instant Toggle**: Add/remove favorites with immediate UI feedback
 - **State Persistence**: Favorite status persists across app restarts
 
+### Settings & Customization
+
+- **Theme Switching**: Toggle between Light, Dark, or System Default themes
+- **Cross-Platform** Persistence: Theme preferences are saved locally and applied instantly across
+  app restarts
+
 ### Native Platform Experiences
 
 **Android**:
@@ -193,11 +199,11 @@ Aura intelligently switches between two modes:
 - [x] State preservation between modes
 - [x] MVI architecture implementation
 - [x] Native UI for both platforms (Compose & SwiftUI)
+- [x] Settings screen (Theme selection)
 
 ### 🚧 In Progress / Planned
 
 - [ ] Offline mode with local caching
-- [ ] Settings screen (quality, theme, etc.)
 - [ ] Video wallpaper support
 - [ ] Share functionality
 - [ ] Pull-to-refresh
