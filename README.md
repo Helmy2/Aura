@@ -8,11 +8,11 @@
 </div>
 
 <p align="center">
-  <strong>A beautiful wallpaper discovery app built with Kotlin Multiplatform</strong>
+  <strong>A beautiful wallpaper & video discovery app built with Kotlin Multiplatform</strong>
 </p>
 
 <p align="center">
-  Browse and download stunning wallpapers from Pexels with native experiences on Android and iOS
+  Browse and download stunning wallpapers and videos from Pexels with native experiences on Android and iOS
 </p>
 
 ---
@@ -20,8 +20,9 @@
 ## ✨ Features
 
 - 🖼️ **Curated Wallpapers** - Browse trending and hand-picked wallpapers
-- 🔍 **Smart Search** - Find wallpapers by keyword with instant results
-- 📥 **Download Support** - Save wallpapers directly to your device
+- 🎥 **Video Support** - Browse, search, and download high-quality videos (Android & iOS)
+- 🔍 **Smart Search** - Find wallpapers and videos by keyword with instant results
+- 📥 **Download Support** - Save wallpapers and videos directly to your device
 - ♾️ **Infinite Scroll** - Seamless pagination for endless browsing
 - 🎯 **State Preservation** - Smart navigation between curated and search modes
 - 🌓 **Native UI** - Jetpack Compose for Android, SwiftUI for iOS
@@ -50,14 +51,14 @@ Aura/
 │ └── iosMain/ # iOS-specific implementations
 │
 ├── app/ # Android Application
-│ ├── feature/ # Feature modules (home, detail)
+│ ├── feature/ # Feature modules (home, detail, videos)
 │ ├── shared/ # Shared Android components
 │ ├── di/ # Android DI modules
 │ ├── MainActivity.kt
 │ └── MainApplication.kt
 │
 └── iosApp/ # iOS Application
-├── feature/ # Feature modules (home, detail)
+├── feature/ # Feature modules (home, detail, videos)
 ├── core/ # Core iOS utilities
 ├── iOSApp.swift # App entry point
 └── Info.plist
@@ -79,13 +80,14 @@ Aura/
 │ ┌───────────────────────────────────────────────┐   │
 │ │ Domain Layer                                  │   │
 │ │ - Wallpaper model                             │   │
-│ │ - WallpaperRepository interface               │   │
+│ │ - Video model                                 │   │
+│ │ - Repositories interfaces                     │   │
 │ │ - MVI State/Intent/Effect                     │   │
 │ └───────────────────────────────────────────────┘   │
 │                          ↕                          │
 │ ┌───────────────────────────────────────────────┐   │
 │ │ Data Layer                                    │   │
-│ │ - WallpaperRepositoryImpl                     │   │
+│ │ - Repository Implementations                  │   │
 │ │ - Ktor HTTP client                            │   │
 │ │ - DTO to Domain mapping                       │   │
 │ └───────────────────────────────────────────────┘   │
@@ -103,7 +105,7 @@ Aura/
 | Serialization | Kotlinx Serialization | JSON parsing               |
 | DI            | Koin                  | Dependency injection       |
 | Concurrency   | Coroutines & Flow     | Async operations           |
-| Persistence   | SQLDelight            | Local database (future)    |
+| Persistence   | SQLDelight            | Local database             |
 
 ### Android
 
@@ -112,17 +114,19 @@ Aura/
 | UI Framework    | Jetpack Compose                  |
 | Navigation      | Navigation 3                     |
 | Image Loading   | Coil                             |
+| Video Playback  | Media3 / ExoPlayer               |
 | Architecture    | MVI + ViewModel                  |
 | Material Design | Material 3 with Adaptive layouts |
 
 ### iOS
 
-| Category      | Technology            |
-|---------------|-----------------------|
-| UI Framework  | SwiftUI               |
-| Navigation    | NavigationStack       |
-| Image Loading | AsyncImage            |
-| Architecture  | Observable ViewModels |
+| Category        | Technology            |
+|-----------------|-----------------------|
+| UI Framework    | SwiftUI               |
+| Navigation      | NavigationStack       |
+| Image Loading   | AsyncImage            |
+| Video Playback  | AVKit                 |
+| Architecture    | Observable ViewModels |
 
 ## 🎯 Key Features Explained
 
@@ -136,35 +140,35 @@ Aura intelligently switches between two modes:
 
 ### Video Support
 
-- **Native Playback**: Integrated AVPlayer for smooth video preview and playback
+- **Native Playback**: Integrated player (ExoPlayer on Android, AVPlayer on iOS) for smooth video preview and playback
 - **Smart Thumbnails**: Video duration badges and optimized previews
-- **Download Integration**: Seamlessly saves videos to the Photos library
+- **Download Integration**: Seamlessly saves videos to the device gallery
 
 ### Infinite Scroll Pagination
 
-- Automatically loads more wallpapers as you scroll
+- Automatically loads more content as you scroll
 - Smart loading states prevent duplicate API calls
 - End-of-list detection stops unnecessary requests
 
 ### Immersive Detail Screen
 
-- **Full-Screen Experience**: Edge-to-edge display showcasing wallpapers in their full glory
+- **Full-Screen Experience**: Edge-to-edge display showcasing media in its full glory
 - **Photographer Attribution**: Elegant gradient overlay at the bottom displaying "Photo by [Name]"
 - **Platform-Native Design**: Respects each platform's design language while maintaining brand consistency
 - **Smooth Navigation**: Seamless transitions from grid to detail view on both platforms
 
 ### Download Functionality
 
-- **One-Tap Download**: Save wallpapers directly to your device with a single tap
+- **One-Tap Download**: Save wallpapers and videos directly to your device with a single tap
 - **Platform-Specific Implementation**:
     - **Android**: Downloads to Pictures/Aura folder with MediaStore integration
     - **iOS**: Saves to Photos library with native permission handling
-- **Original Quality**: Downloads the highest resolution available from Pexels
+- **Original Quality**: Downloads the highest resolution/quality available from Pexels
 - **Permission Management**: Handles storage/photo library permissions gracefully
 
 ### Favorites System
 
-- **Local Storage**: SQLDelight database stores favorites with full wallpaper details
+- **Local Storage**: SQLDelight database stores favorites with full media details
 - **Real-time Sync**: Favorites automatically update across Home, Search, and Favorites screens
 - **Offline Access**: Access your favorite wallpapers anytime, even without internet
 - **Instant Toggle**: Add/remove favorites with immediate UI feedback
