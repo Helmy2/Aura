@@ -90,7 +90,7 @@ fun MainNavHost(
                 entry<Destination.WallpaperDetail>(
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { route ->
-                    WallpaperScreen(route.wallpaper.id)
+                    WallpaperScreen(route.wallpaper)
                 }
                 entry<Destination.Settings> {
                     SettingsScreen()
@@ -104,7 +104,7 @@ fun MainNavHost(
                 entry<Destination.VideoDetail>(
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { route ->
-                    VideoDetailScreen(route.video.id)
+                    VideoDetailScreen(route.video)
                 }
             },
         )

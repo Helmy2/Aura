@@ -1,5 +1,8 @@
 package com.example.aura.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Video(
     val id: Long,
     val width: Int,
@@ -17,13 +20,14 @@ data class Video(
     val imageUrl: String get() = videoPictures.firstOrNull()?.picture ?: image
 }
 
-
+@Serializable
 data class User(
     val id: Long,
     val name: String,
     val url: String
 )
 
+@Serializable
 data class VideoFile(
     val id: Long,
     val quality: String,
@@ -34,6 +38,7 @@ data class VideoFile(
     val link: String
 )
 
+@Serializable
 data class VideoPicture(
     val id: Long,
     val picture: String,

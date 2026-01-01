@@ -25,7 +25,6 @@ import androidx.window.core.layout.WindowSizeClass
 import com.example.aura.domain.model.MediaContent
 import com.example.aura.shared.core.extensions.plus
 import com.example.aura.shared.core.extensions.shimmerEffect
-import com.example.aura.shared.model.toUi
 import com.example.aura.shared.theme.dimens
 
 @Composable
@@ -93,14 +92,14 @@ fun MediaContentGallery(
                 items(items, key = { it.id }) { item ->
                     when (item) {
                         is MediaContent.VideoContent -> VideoItem(
-                            video = item.video.toUi(),
+                            video = item.video,
                             onClick = { onItemClick(item) },
                             onFavoriteClick = { onFavoriteClick(item) },
                             modifier = Modifier.animateItem()
                         )
 
                         is MediaContent.WallpaperContent -> WallpaperItem(
-                            wallpaper = item.wallpaper.toUi(),
+                            wallpaper = item.wallpaper,
                             onClick = { onItemClick(item) },
                             onFavoriteClick = { onFavoriteClick(item) },
                             modifier = Modifier.animateItem()

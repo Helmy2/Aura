@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.model.MediaContent
 import com.example.aura.domain.repository.FavoritesRepository
 import com.example.aura.shared.core.mvi.MviViewModel
-import com.example.aura.shared.model.toUi
 import com.example.aura.shared.navigation.AppNavigator
 import com.example.aura.shared.navigation.Destination
 import kotlinx.coroutines.flow.catch
@@ -51,11 +50,11 @@ class FavoritesViewModel(
             is FavoritesIntent.OnItemClicked -> {
                 when (intent.item) {
                     is MediaContent.VideoContent -> navigator.navigate(
-                        Destination.VideoDetail(intent.item.video.toUi())
+                        Destination.VideoDetail(intent.item.video)
                     )
 
                     is MediaContent.WallpaperContent -> navigator.navigate(
-                        Destination.WallpaperDetail(intent.item.wallpaper.toUi())
+                        Destination.WallpaperDetail(intent.item.wallpaper)
                     )
                 }
                 currentState.only()

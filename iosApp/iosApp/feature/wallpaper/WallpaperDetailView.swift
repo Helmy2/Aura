@@ -2,8 +2,8 @@ import Shared
 import SwiftUI
 
 struct WallpaperDetailView: View {
-    let wallpaper: WallpaperUi
-    var onFavoriteToggle: ((WallpaperUi) -> Void)?
+    let wallpaper: Wallpaper
+    var onFavoriteToggle: ((Wallpaper) -> Void)?
 
     @State private var isFavorite: Bool
     @State private var isDownloading = false
@@ -11,7 +11,7 @@ struct WallpaperDetailView: View {
     @State private var toastMessage = ""
     @Environment(\.presentationMode) var presentationMode
 
-    init(wallpaper: WallpaperUi, onFavoriteToggle: ((WallpaperUi) -> Void)? = nil) {
+    init(wallpaper: Wallpaper, onFavoriteToggle: ((Wallpaper) -> Void)? = nil) {
         self.wallpaper = wallpaper
         self.onFavoriteToggle = onFavoriteToggle
         _isFavorite = State(initialValue: wallpaper.isFavorite)
@@ -68,7 +68,7 @@ struct WallpaperDetailView: View {
 
                 // Bottom Info
                 HStack {
-                    Text("Photo by \(wallpaper.photographerName)")
+                    Text("Photo by \(wallpaper.photographer)")
                         .font(.headline)
                         .foregroundColor(.white)
                         .shadow(radius: 2)

@@ -67,27 +67,24 @@ struct FavoritesView: View {
                 ForEach(viewModel.favorites, id: \.id) { item in
                     MediaContentGridCell(
                         content: item,
-                        onRemoveFavorite: {
-                            switch item {
-                            case .wallpaper(let wallpaper):
-                                viewModel.toggleFavorite(wallpaper: wallpaper)
-                            case .video(let video):
-                                viewModel.toggleFavorite(video: video)
+                        onWallpaperNavigate: { wallpaper in
+                            coordinator.navigateToWallpaperDetail(
+                                wallpaper: wallpaper
+                            ) { w in
+                                viewModel.toggleFavorite(wallpaper: w)
                             }
                         },
-                        onNavigate: {
-                            switch item {
-                            case .wallpaper(let wallpaper):
-                                coordinator.navigateToWallpaperDetail(
-                                    wallpaper: wallpaper
-                                ) { w in
-                                    viewModel.toggleFavorite(wallpaper: w)
-                                }
-                            case .video(let video):
-                                coordinator.navigateToVideoDetail(video: video) { w in
-                                    viewModel.toggleFavorite(video: w)
-                                }
+                        onRemoveWallpaperFavorite: { wallpaper in
+                            viewModel.toggleFavorite(wallpaper: wallpaper)
+                        },
+                        onVideoNavigate: { video in
+                            coordinator.navigateToVideoDetail(video: video) {
+                                w in
+                                viewModel.toggleFavorite(video: w)
                             }
+                        },
+                        onRemoveVideoFavorite: { video in
+                            viewModel.toggleFavorite(video: video)
                         }
                     )
                 }
@@ -99,24 +96,27 @@ struct FavoritesView: View {
 }
 
 struct MediaContentGridCell: View {
-    let content: MediaContentUi
-    var onRemoveFavorite: () -> Void
-    var onNavigate: () -> Void
+    let content: MediaContent
+    var onWallpaperNavigate: (Wallpaper) -> Void
+    var onRemoveWallpaperFavorite: (Wallpaper) -> Void
+
+    var onVideoNavigate: (Video) -> Void
+    var onRemoveVideoFavorite: (Video) -> Void
 
     var body: some View {
-        switch content {
-        case .wallpaper(let wallpaper):
+        switch onEnum(of: content) {
+        case .wallpaperContent(let content):
             WallpaperGridCell(
-                wallpaper: wallpaper,
-                onTap: onNavigate,
-                onFavoriteToggle: onRemoveFavorite,
+                wallpaper: content.wallpaper,
+                onTap: { onWallpaperNavigate(content.wallpaper) },
+                onFavoriteToggle: { onRemoveWallpaperFavorite(content.wallpaper) },
                 )
 
-        case .video(let video):
+        case .videoContent(let content):
             VideoGridCell(
-                video: video,
-                onTap: onNavigate,
-                onFavoriteToggle: onRemoveFavorite,
+                video: content.video,
+                onTap: { onVideoNavigate(content.video) },
+                onFavoriteToggle: { onRemoveVideoFavorite(content.video) },
                 )
         }
     }

@@ -12,8 +12,8 @@ enum NavigationRoute: Hashable {
     case home
     case favorites
     case settings
-    case wallpaperDetail(WallpaperUi, (WallpaperUi) -> Void)
-    case videoDetail(VideoUi, (VideoUi) -> Void)
+    case wallpaperDetail(Wallpaper, (Wallpaper) -> Void)
+    case videoDetail(Video, (Video) -> Void)
     case wallpaperList
     case videoList
 

@@ -52,8 +52,7 @@ struct VideosView: View {
                             viewModel.isSearchMode
                                 ? viewModel.searchVideos : viewModel.popularVideos
 
-                        ForEach(list) { video in
-
+                        ForEach(list, id: \.id) { video in
                             VideoGridCell(
                                 video: video,
                                 onTap: {

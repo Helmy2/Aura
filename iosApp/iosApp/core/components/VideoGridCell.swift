@@ -1,14 +1,15 @@
 import SwiftUI
+import Shared
 
 struct VideoGridCell: View {
-    let video: VideoUi
+    let video: Video
     var onTap: (() -> Void)
     var onFavoriteToggle: (() -> Void)
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             Button(action: onTap) {
-                AsyncImage(url: URL(string: video.thumbnailUrl)) { phase in
+                AsyncImage(url: URL(string: video.imageUrl)) { phase in
                     switch phase {
                     case .empty:
                         Color.gray.opacity(0.2)
@@ -29,7 +30,7 @@ struct VideoGridCell: View {
             }
 
             HStack {
-                Text(video.photographerName)
+                Text(video.user.name)
                     .font(.caption)
                     .fontWeight(.medium)
                     .foregroundStyle(.white)
@@ -55,7 +56,7 @@ struct VideoGridCell: View {
             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
 
             VStack {
-                Text(formatDuration(video.duration))
+                Text(formatDuration(Int(video.duration)))
                     .font(.caption)
                     .bold()
                     .padding(6)

@@ -3,17 +3,12 @@ package com.example.aura.feature.videos.detail
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.model.Video
 import com.example.aura.domain.repository.FavoritesRepository
-import com.example.aura.domain.repository.VideoRepository
 import com.example.aura.shared.core.mvi.MviViewModel
 import com.example.aura.shared.core.util.VideoDownloader
 import com.example.aura.shared.navigation.AppNavigator
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class VideoDetailViewModel(
-    private val videoRepository: VideoRepository,
     private val favoritesRepository: FavoritesRepository,
     private val navigator: AppNavigator,
     private val videoDownloader: VideoDownloader
@@ -25,9 +20,7 @@ class VideoDetailViewModel(
     ): Pair<VideoDetailState, VideoDetailEffect?> {
         return when (intent) {
             is VideoDetailIntent.LoadVideo -> {
-                loadVideo(intent.videoId)
-                observeFavoriteStatus(intent.videoId)
-                currentState.copy(isLoading = true).only()
+                currentState.copy(video = intent.video).only()
             }
 
             is VideoDetailIntent.VideoLoaded -> {
@@ -70,7 +63,9 @@ class VideoDetailViewModel(
                         }
                     }
                 }
-                currentState.only()
+                currentState.copy(
+                    video = video?.copy(isFavorite = !video.isFavorite)
+                ).only()
             }
 
             is VideoDetailIntent.FavoriteStatusUpdated -> {
@@ -78,26 +73,6 @@ class VideoDetailViewModel(
                 currentState.copy(video = updatedVideo).only()
             }
         }
-    }
-
-    private fun loadVideo(videoId: Long) {
-        viewModelScope.launch {
-            try {
-                val video = videoRepository.getVideoById(videoId)
-                sendIntent(VideoDetailIntent.VideoLoaded(video))
-            } catch (e: Exception) {
-                sendIntent(VideoDetailIntent.LoadError(e.message ?: "Unknown error"))
-            }
-        }
-    }
-
-    private fun observeFavoriteStatus(videoId: Long) {
-        favoritesRepository.observeFavoriteVideos()
-            .map { favorites -> favorites.any { it.id == videoId } }
-            .onEach { isFavorite ->
-                sendIntent(VideoDetailIntent.FavoriteStatusUpdated(isFavorite))
-            }
-            .launchIn(viewModelScope)
     }
 
     private fun downloadVideo(video: Video) {

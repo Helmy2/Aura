@@ -2,7 +2,6 @@ package com.example.aura.feature.wallpaper.detail
 
 import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.repository.FavoritesRepository
-import com.example.aura.domain.repository.WallpaperRepository
 import com.example.aura.feature.wallpaper.detail.WallpaperDetailEffect.ShowError
 import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.DownloadError
 import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.DownloadFinished
@@ -15,7 +14,6 @@ import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.ToggleFav
 import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.WallpaperLoaded
 import com.example.aura.shared.core.mvi.MviViewModel
 import com.example.aura.shared.core.util.ImageDownloader
-import com.example.aura.shared.model.toUi
 import com.example.aura.shared.navigation.AppNavigator
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -24,7 +22,6 @@ import kotlinx.coroutines.launch
 
 class WallpaperViewModel(
     private val favoritesRepository: FavoritesRepository,
-    private val wallpaperRepository: WallpaperRepository,
     private val imageDownloader: ImageDownloader,
     private val navigator: AppNavigator
 ) : MviViewModel<WallpaperDetailState, WallpaperDetailIntent, WallpaperDetailEffect>(
@@ -37,8 +34,9 @@ class WallpaperViewModel(
     ): Pair<WallpaperDetailState, WallpaperDetailEffect?> {
         return when (intent) {
             is LoadWallpaper -> {
-                loadWallpaper(intent.wallpaperId)
-                currentState.copy(isLoading = true).only()
+                currentState.copy(
+                    wallpaper = intent.wallpaper
+                ).only()
             }
 
             is OnBackClicked -> {
@@ -65,8 +63,7 @@ class WallpaperViewModel(
             is ToggleFavorite -> {
                 viewModelScope.launch {
                     try {
-                        val wallpaper = wallpaperRepository.getWallpaperById(intent.wallpaper.id)
-                        favoritesRepository.toggleFavorite(wallpaper)
+                        favoritesRepository.toggleFavorite(intent.wallpaper)
                     } catch (e: Exception) {
                         sendIntent(DownloadError(e.message ?: "Failed to update favorite"))
                     }
@@ -94,17 +91,6 @@ class WallpaperViewModel(
 
             is DownloadFinished -> {
                 currentState.copy(isDownloading = false).only()
-            }
-        }
-    }
-
-    private fun loadWallpaper(wallpaperId: Long) {
-        viewModelScope.launch {
-            try {
-                val wallpaper = wallpaperRepository.getWallpaperById(wallpaperId)
-                sendIntent(WallpaperLoaded(wallpaper.toUi()))
-            } catch (e: Exception) {
-                sendIntent(LoadError(e.message ?: "Failed to load wallpaper"))
             }
         }
     }

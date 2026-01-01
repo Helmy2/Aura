@@ -6,8 +6,8 @@ import Shared
 class WallpaperListViewModel {
 
     // MARK: - State
-    var wallpapers: [WallpaperUi] = []
-    var searchWallpapers: [WallpaperUi] = []
+    var wallpapers: [Wallpaper] = []
+    var searchWallpapers: [Wallpaper] = []
     var isLoading: Bool = false
     var isPaginationLoading: Bool = false
     var errorMessage: String? = nil
@@ -28,7 +28,6 @@ class WallpaperListViewModel {
     init() {
         self.repository = iOSApp.dependencies.wallpaperRepository
         self.favoritesRepository = iOSApp.dependencies.favoritesRepository
-        observeFavorites()
     }
 
     // MARK: - Intents
@@ -86,49 +85,27 @@ class WallpaperListViewModel {
 
     // MARK: - Intents (Updated toggleFavorite)
 
-    func toggleFavorite(wallpaper: WallpaperUi) {
+    func toggleFavorite(wallpaper: Wallpaper) {
         Task {
             do {
-                let kmWallpaper = wallpaper.toDomain()
-                try await favoritesRepository.toggleFavorite(wallpaper: kmWallpaper)
+                try await favoritesRepository.toggleFavorite(wallpaper: wallpaper)
+
+                if let index = wallpapers.firstIndex(where: { $0.id == wallpaper.id }) {
+                    let isFavorite = !wallpapers[index].isFavorite
+                    wallpapers[index] = wallpapers[index].copy(isFavorite: isFavorite)
+                }
+
+                if let index = searchWallpapers.firstIndex(where: { $0.id == wallpaper.id }) {
+                    let isFavorite = !searchWallpapers[index].isFavorite
+                    searchWallpapers[index] = searchWallpapers[index].copy(isFavorite: isFavorite)
+                }
+                
             } catch {
                 self.errorMessage = error.localizedDescription
             }
         }
     }
 
-    // MARK: - Private Logic
-    private func observeFavorites() {
-        favoritesTask?.cancel()
-        favoritesTask = Task { @MainActor in
-            for await favorites in favoritesRepository.observeFavoritesWallpapers() {
-                let favoriteIds = Set(
-                    favorites.map {
-                        $0.id
-                    }
-                )
-                self.updateFavoritesState(favoriteIds: favoriteIds)
-            }
-        }
-    }
-
-    @MainActor
-    private func updateFavoritesState(favoriteIds: Set<Int64>) {
-        for i in 0..<wallpapers.count {
-            let isFav = favoriteIds.contains(wallpapers[i].id)
-            if wallpapers[i].isFavorite != isFav {
-                wallpapers[i].isFavorite = isFav
-            }
-        }
-
-        // Update search list if active
-        for i in 0..<searchWallpapers.count {
-            let isFav = favoriteIds.contains(searchWallpapers[i].id)
-            if searchWallpapers[i].isFavorite != isFav {
-                searchWallpapers[i].isFavorite = isFav
-            }
-        }
-    }
 
     private func performFetch(query: String?, page: Int, isSearch: Bool) {
         Task {
@@ -153,9 +130,7 @@ class WallpaperListViewModel {
                         self.isPaginationLoading = false
                     }
                 } else {
-                    let uiResults = result.map {
-                        $0.toUi()
-                    }
+                    let uiResults = result
 
                     await MainActor.run {
                         if isSearch {

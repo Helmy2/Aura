@@ -39,17 +39,17 @@ import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.example.aura.domain.model.Video
 import com.example.aura.shared.core.extensions.plus
 import com.example.aura.shared.core.extensions.shimmerEffect
-import com.example.aura.shared.model.VideoUi
 import com.example.aura.shared.theme.dimens
 import java.util.Locale
 
 @Composable
 fun VideoGallery(
-    videos: List<VideoUi>,
-    onVideoClick: (VideoUi) -> Unit,
-    onFavoriteClick: (VideoUi) -> Unit,
+    videos: List<Video>,
+    onVideoClick: (Video) -> Unit,
+    onFavoriteClick: (Video) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(16.dp),
@@ -138,7 +138,7 @@ fun VideoGallery(
 
 @Composable
 fun VideoItem(
-    video: VideoUi,
+    video: Video,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFavoriteClick: () -> Unit,

@@ -4,8 +4,8 @@ import Shared
 import SwiftUI
 
 struct VideoDetailView: View {
-    let video: VideoUi
-    var onFavoriteToggle: ((VideoUi) -> Void)?
+    let video: Video
+    var onFavoriteToggle: ((Video) -> Void)?
     
     @State private var player: AVPlayer?
     @State private var isDownloading = false
@@ -15,7 +15,7 @@ struct VideoDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode
 
-    init(video: VideoUi, onFavoriteToggle: ((VideoUi) -> Void)? = nil) {
+    init(video: Video, onFavoriteToggle: ((Video) -> Void)? = nil) {
         self.video = video
         self.onFavoriteToggle = onFavoriteToggle
         _isFavorite = State(initialValue: video.isFavorite)
@@ -85,7 +85,7 @@ struct VideoDetailView: View {
 
                 // Bottom Info
                 HStack {
-                    Text("Video by \(video.photographerName)")
+                    Text("Video by \(video.user.name)")
                         .font(.headline)
                         .foregroundColor(.white)
                         .shadow(radius: 2)

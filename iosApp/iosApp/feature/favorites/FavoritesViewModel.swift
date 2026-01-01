@@ -6,7 +6,7 @@ import Shared
 class FavoritesViewModel {
 
     // MARK: - State
-    var favorites: [MediaContentUi] = []
+    var favorites: [MediaContent] = []
     var isLoading: Bool = true
     var errorMessage: String? = nil
 
@@ -31,9 +31,7 @@ class FavoritesViewModel {
 
         observationTask = Task { @MainActor in
             for await items in favoritesRepository.observeFavorites() {
-                self.favorites = items.map {
-                    $0.toUi()
-                }
+                self.favorites = items
                 self.isLoading = false
             }
         }
@@ -46,22 +44,20 @@ class FavoritesViewModel {
 
     // MARK: - Intents
 
-    func toggleFavorite(video: VideoUi) {
+    func toggleFavorite(video: Video) {
         Task {
             do {
-                let domainVideo = try await videoRepository.getVideoById(id: video.id)
-                try await favoritesRepository.toggleFavorite(video: domainVideo)
+                try await favoritesRepository.toggleFavorite(video: video)
             } catch {
                 self.errorMessage = error.localizedDescription
             }
         }
     }
 
-    func toggleFavorite(wallpaper: WallpaperUi) {
+    func toggleFavorite(wallpaper: Wallpaper) {
         Task {
             do {
-                let domainWallpaper = try await wallpaperRepository.getWallpaperById(id: wallpaper.id)
-                try await favoritesRepository.toggleFavorite(wallpaper: domainWallpaper)
+                try await favoritesRepository.toggleFavorite(wallpaper: wallpaper)
             } catch {
                 self.errorMessage = error.localizedDescription
             }

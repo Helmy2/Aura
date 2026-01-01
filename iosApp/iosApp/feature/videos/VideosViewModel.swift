@@ -5,8 +5,8 @@ import Shared
 @MainActor
 class VideosViewModel: ObservableObject {
     // MARK: - State
-    @Published var popularVideos: [VideoUi] = []
-    @Published var searchVideos: [VideoUi] = []
+    @Published var popularVideos: [Video] = []
+    @Published var searchVideos: [Video] = []
     @Published var isLoading: Bool = false
     @Published var isPaginationLoading: Bool = false
     @Published var errorMessage: String? = nil
@@ -102,9 +102,7 @@ class VideosViewModel: ObservableObject {
                     self.isLoading = false
                     self.isPaginationLoading = false
                 } else {
-                    let uiResults = result.map {
-                        $0.toUi()
-                    }
+                    let uiResults = result
 
                     if isSearch {
                         if page == 1 {
@@ -149,23 +147,19 @@ class VideosViewModel: ObservableObject {
         }
     }
 
-    func toggleFavorite(video: VideoUi) {
+    func toggleFavorite(video: Video) {
         Task {
             do {
-                let domainVideo = try await repository.getVideoById(id: video.id)
-                try await favoritesRepository.toggleFavorite(video: domainVideo)
+                try await favoritesRepository.toggleFavorite(video: video)
 
                 if let index = popularVideos.firstIndex(where: { $0.id == video.id }) {
-                    var updated = popularVideos[index]
-
-                    updated.isFavorite.toggle()
-                    popularVideos[index] = updated
+                    let isFavorite = !popularVideos[index].isFavorite
+                    popularVideos[index] = popularVideos[index].copy(isFavorite: isFavorite)
                 }
 
                 if let index = searchVideos.firstIndex(where: { $0.id == video.id }) {
-                    var updated = searchVideos[index]
-                    updated.isFavorite.toggle()
-                    searchVideos[index] = updated
+                    let isFavorite = !searchVideos[index].isFavorite
+                    searchVideos[index] = searchVideos[index].copy(isFavorite: isFavorite)
                 }
 
             } catch {

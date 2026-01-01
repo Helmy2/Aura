@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.aura.domain.model.Wallpaper
 import com.example.aura.shared.component.AuraImage
 import com.example.aura.shared.component.AuraScaffold
 import com.example.aura.shared.component.AuraTransparentTopBar
@@ -41,7 +42,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Suppress("ParamsComparedByRef")
 @Composable
 fun WallpaperScreen(
-    wallpaperId: Long,
+    wallpaper: Wallpaper,
     viewModel: WallpaperViewModel = koinViewModel()
 ) {
     SystemBarStyle(isStatusBarOnDark = true, restoreOnDispose = true)
@@ -49,7 +50,7 @@ fun WallpaperScreen(
     val snackbarState = remember { SnackbarHostState() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     DisposableEffect(Unit) {
-        viewModel.sendIntent(WallpaperDetailIntent.LoadWallpaper(wallpaperId))
+        viewModel.sendIntent(WallpaperDetailIntent.LoadWallpaper(wallpaper))
         onDispose {
 
         }
@@ -183,7 +184,7 @@ fun WallpaperScreen(
                         .padding(bottom = padding.calculateBottomPadding())
             ) {
                 Text(
-                    text = state.wallpaper!!.photographerName,
+                    text = state.wallpaper!!.photographer,
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White
                 )

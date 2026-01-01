@@ -50,23 +50,25 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.PlayerSurface
 import androidx.media3.ui.compose.state.rememberPlayPauseButtonState
+import com.example.aura.domain.model.Video
 import com.example.aura.shared.component.AuraScaffold
 import com.example.aura.shared.core.extensions.ObserveEffect
 import com.example.aura.shared.theme.dimens
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 
+
 @Composable
 fun VideoDetailScreen(
-    videoId: Long,
+    video: Video,
     viewModel: VideoDetailViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(videoId) {
-        viewModel.sendIntent(VideoDetailIntent.LoadVideo(videoId))
+    LaunchedEffect(video) {
+        viewModel.sendIntent(VideoDetailIntent.LoadVideo(video))
     }
 
     ObserveEffect(viewModel.effect) { effect ->

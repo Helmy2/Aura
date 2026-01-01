@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.aura.domain.repository.FavoritesRepository
 import com.example.aura.domain.repository.WallpaperRepository
 import com.example.aura.shared.core.mvi.MviViewModel
-import com.example.aura.shared.model.toUi
 import com.example.aura.shared.navigation.AppNavigator
 import com.example.aura.shared.navigation.Destination
 import kotlinx.coroutines.flow.launchIn
@@ -110,9 +109,7 @@ class WallpaperListViewModel(
             is WallpaperListIntent.ToggleFavorite -> {
                 viewModelScope.launch {
                     try {
-                        val wallpaper =
-                            wallpaperRepository.getWallpaperById(id = intent.wallpaper.id)
-                        favoritesRepository.toggleFavorite(wallpaper)
+                        favoritesRepository.toggleFavorite(intent.wallpaper)
                     } catch (_: Exception) {
 
                     }
@@ -150,8 +147,7 @@ class WallpaperListViewModel(
                 if (wallpapers.isEmpty()) {
                     sendIntent(WallpaperListIntent.SetEndReached)
                 } else {
-                    val uiWallpapers = wallpapers.map { it.toUi() }
-                    sendIntent(WallpaperListIntent.AppendWallpapers(uiWallpapers, page))
+                    sendIntent(WallpaperListIntent.AppendWallpapers(wallpapers, page))
                 }
             } catch (e: Exception) {
                 sendIntent(WallpaperListIntent.OnError(e.message.orEmpty()))
@@ -167,8 +163,7 @@ class WallpaperListViewModel(
                 if (results.isEmpty()) {
                     sendIntent(WallpaperListIntent.SetEndReached)
                 } else {
-                    val uiWallpapers = results.map { it.toUi() }
-                    sendIntent(WallpaperListIntent.AppendWallpapers(uiWallpapers, page))
+                    sendIntent(WallpaperListIntent.AppendWallpapers(results, page))
                 }
             } catch (e: Exception) {
                 sendIntent(WallpaperListIntent.OnError(e.message.orEmpty()))

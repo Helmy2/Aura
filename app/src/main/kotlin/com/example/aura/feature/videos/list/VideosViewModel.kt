@@ -1,11 +1,11 @@
 package com.example.aura.feature.videos.list
 
 import androidx.lifecycle.viewModelScope
+import com.example.aura.domain.model.Video
 import com.example.aura.domain.repository.FavoritesRepository
 import com.example.aura.domain.repository.VideoRepository
 import com.example.aura.feature.videos.list.VideosEffect.ShowError
 import com.example.aura.shared.core.mvi.MviViewModel
-import com.example.aura.shared.model.toUi
 import com.example.aura.shared.navigation.AppNavigator
 import com.example.aura.shared.navigation.Destination.VideoDetail
 import kotlinx.coroutines.flow.launchIn
@@ -119,7 +119,7 @@ class VideosViewModel(
             }
 
             is VideosIntent.OnFavoriteClicked -> {
-                toggleFavorite(intent.video.id)
+                toggleFavorite(intent.video)
                 currentState.only()
             }
 
@@ -138,11 +138,10 @@ class VideosViewModel(
         }
     }
 
-    private fun toggleFavorite(id: Long) {
+    private fun toggleFavorite(video: Video) {
         viewModelScope.launch {
             try {
-                val domainVideo = videoRepository.getVideoById(id)
-                favoritesRepository.toggleFavorite(domainVideo)
+                favoritesRepository.toggleFavorite(video)
             } catch (e: Exception) {
                 sendIntent(VideosIntent.OnError(e.message ?: "Failed to toggle favorite"))
             }
@@ -153,7 +152,6 @@ class VideosViewModel(
         viewModelScope.launch {
             try {
                 val videos = videoRepository.getPopularVideos(page)
-                    .map { it.toUi() }
                 sendIntent(VideosIntent.VideosLoaded(videos, page))
             } catch (e: Exception) {
                 sendIntent(VideosIntent.OnError(e.message ?: "Failed to load videos"))
@@ -165,7 +163,6 @@ class VideosViewModel(
         viewModelScope.launch {
             try {
                 val videos = videoRepository.searchVideos(query, page)
-                    .map { it.toUi() }
                 sendIntent(VideosIntent.SearchResultsLoaded(videos, page))
             } catch (e: Exception) {
                 sendIntent(VideosIntent.OnError(e.message ?: "Search failed"))

@@ -27,17 +27,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import coil3.compose.SubcomposeAsyncImage
+import com.example.aura.domain.model.Wallpaper
 import com.example.aura.shared.core.extensions.plus
 import com.example.aura.shared.core.extensions.shimmerEffect
-import com.example.aura.shared.model.WallpaperUi
 import com.example.aura.shared.theme.dimens
 
 @Composable
 fun WallpaperGallery(
     modifier: Modifier = Modifier.Companion,
-    wallpapers: List<WallpaperUi>,
-    onWallpaperClick: (WallpaperUi) -> Unit,
-    onWallpaperFavoriteClick: (WallpaperUi) -> Unit,
+    wallpapers: List<Wallpaper>,
+    onWallpaperClick: (Wallpaper) -> Unit,
+    onWallpaperFavoriteClick: (Wallpaper) -> Unit,
     isPaginationLoading: Boolean = false,
     isLoading: Boolean = false,
     listState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
@@ -125,7 +125,7 @@ fun WallpaperGallery(
 
 @Composable
 fun WallpaperItem(
-    wallpaper: WallpaperUi,
+    wallpaper: Wallpaper,
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -133,14 +133,14 @@ fun WallpaperItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(wallpaper.aspectRatio)
+            .aspectRatio(wallpaper.width / wallpaper.height.toFloat())
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             SubcomposeAsyncImage(
                 model = wallpaper.smallImageUrl,
-                contentDescription = wallpaper.photographerName,
+                contentDescription = wallpaper.photographer,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 loading = {

@@ -21,11 +21,11 @@ class NavigationCoordinator: ObservableObject {
         path.append(NavigationRoute.videoList)
     }
 
-    func navigateToWallpaperDetail(wallpaper: WallpaperUi, onToggle: @escaping (WallpaperUi) -> Void) {
+    func navigateToWallpaperDetail(wallpaper: Wallpaper, onToggle: @escaping (Wallpaper) -> Void) {
         path.append(NavigationRoute.wallpaperDetail(wallpaper, onToggle))
     }
 
-    func navigateToVideoDetail(video: VideoUi, onToggle: @escaping (VideoUi) -> Void) {
+    func navigateToVideoDetail(video: Video, onToggle: @escaping (Video) -> Void) {
         path.append(NavigationRoute.videoDetail(video, onToggle))
     }
 

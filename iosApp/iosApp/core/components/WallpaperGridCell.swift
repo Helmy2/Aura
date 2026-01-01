@@ -2,7 +2,7 @@ import Shared
 import SwiftUI
 
 struct WallpaperGridCell: View {
-    let wallpaper: WallpaperUi
+    let wallpaper: Wallpaper
     let onTap: () -> Void
     var onFavoriteToggle: (() -> Void)
 
@@ -31,7 +31,7 @@ struct WallpaperGridCell: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(wallpaper.photographerName)
+                    Text(wallpaper.photographer)
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundStyle(.white)

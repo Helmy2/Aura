@@ -10,7 +10,7 @@ data class VideoDetailState(
 )
 
 sealed class VideoDetailIntent {
-    data class LoadVideo(val videoId: Long) : VideoDetailIntent()
+    data class LoadVideo(val video: Video) : VideoDetailIntent()
     data class VideoLoaded(val video: Video) : VideoDetailIntent()
     data class LoadError(val message: String) : VideoDetailIntent()
     data object OnBackClicked : VideoDetailIntent()
