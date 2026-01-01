@@ -21,12 +21,12 @@ class NavigationCoordinator: ObservableObject {
         path.append(NavigationRoute.videoList)
     }
 
-    func navigateToDetail(wallpaper: WallpaperUi) {
-        path.append(NavigationRoute.wallpaperDetail(wallpaper))
+    func navigateToWallpaperDetail(wallpaper: WallpaperUi, onToggle: @escaping (WallpaperUi) -> Void) {
+        path.append(NavigationRoute.wallpaperDetail(wallpaper, onToggle))
     }
 
-    func navigateToVideoDetail(video: VideoUi) {
-        path.append(NavigationRoute.videoDetail(video))
+    func navigateToVideoDetail(video: VideoUi, onToggle: @escaping (VideoUi) -> Void) {
+        path.append(NavigationRoute.videoDetail(video, onToggle))
     }
 
     // Pop to root

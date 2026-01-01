@@ -6,18 +6,20 @@ import Shared
 class FavoritesViewModel {
 
     // MARK: - State
-    var favorites: [WallpaperUi] = []
+    var favorites: [MediaContentUi] = []
     var isLoading: Bool = true
     var errorMessage: String? = nil
 
-    private let repository: WallpaperRepository
+    private let wallpaperRepository: WallpaperRepository
     private let favoritesRepository: FavoritesRepository
+    private let videoRepository: VideoRepository
 
     private var observationTask: Task<Void, Never>? = nil
 
     init() {
-        self.repository = iOSApp.dependencies.wallpaperRepository
+        self.wallpaperRepository = iOSApp.dependencies.wallpaperRepository
         self.favoritesRepository = iOSApp.dependencies.favoritesRepository
+        self.videoRepository = iOSApp.dependencies.videoRepository
     }
 
     // MARK: - Lifecycle
@@ -28,12 +30,10 @@ class FavoritesViewModel {
         isLoading = true
 
         observationTask = Task { @MainActor in
-            for await wallpapers in favoritesRepository.observeFavoritesWallpapers() {
-                let uiList = wallpapers.map {
+            for await items in favoritesRepository.observeFavorites() {
+                self.favorites = items.map {
                     $0.toUi()
                 }
-
-                self.favorites = uiList
                 self.isLoading = false
             }
         }
@@ -46,10 +46,22 @@ class FavoritesViewModel {
 
     // MARK: - Intents
 
-    func removeFavorite(wallpaper: WallpaperUi) {
+    func toggleFavorite(video: VideoUi) {
         Task {
             do {
-                try await favoritesRepository.toggleFavorite(wallpaper: wallpaper.toDomain())
+                let domainVideo = try await videoRepository.getVideoById(id: video.id)
+                try await favoritesRepository.toggleFavorite(video: domainVideo)
+            } catch {
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    func toggleFavorite(wallpaper: WallpaperUi) {
+        Task {
+            do {
+                let domainWallpaper = try await wallpaperRepository.getWallpaperById(id: wallpaper.id)
+                try await favoritesRepository.toggleFavorite(wallpaper: domainWallpaper)
             } catch {
                 self.errorMessage = error.localizedDescription
             }

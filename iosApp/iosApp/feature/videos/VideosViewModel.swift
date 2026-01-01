@@ -21,9 +21,11 @@ class VideosViewModel: ObservableObject {
 
     // Dependencies
     private let repository: VideoRepository
+    private let favoritesRepository: FavoritesRepository
 
     init() {
         self.repository = iOSApp.dependencies.videoRepository
+        self.favoritesRepository = iOSApp.dependencies.favoritesRepository
     }
 
     // MARK: - Intents
@@ -143,6 +145,31 @@ class VideosViewModel: ObservableObject {
                 self.errorMessage = error.localizedDescription
                 self.isLoading = false
                 self.isPaginationLoading = false
+            }
+        }
+    }
+
+    func toggleFavorite(video: VideoUi) {
+        Task {
+            do {
+                let domainVideo = try await repository.getVideoById(id: video.id)
+                try await favoritesRepository.toggleFavorite(video: domainVideo)
+
+                if let index = popularVideos.firstIndex(where: { $0.id == video.id }) {
+                    var updated = popularVideos[index]
+
+                    updated.isFavorite.toggle()
+                    popularVideos[index] = updated
+                }
+
+                if let index = searchVideos.firstIndex(where: { $0.id == video.id }) {
+                    var updated = searchVideos[index]
+                    updated.isFavorite.toggle()
+                    searchVideos[index] = updated
+                }
+
+            } catch {
+                print("Failed to toggle favorite: \(error)")
             }
         }
     }

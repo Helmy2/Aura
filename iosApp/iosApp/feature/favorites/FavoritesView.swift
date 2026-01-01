@@ -4,7 +4,7 @@ import SwiftUI
 struct FavoritesView: View {
     @State private var viewModel = FavoritesViewModel()
     @EnvironmentObject var coordinator: NavigationCoordinator
-    
+
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),
@@ -64,20 +64,60 @@ struct FavoritesView: View {
     private var favoritesGrid: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(viewModel.favorites, id: \.id) { wallpaper in
-                    WallpaperGridCell(
-                        wallpaper: wallpaper,
-                        onTap: {
-                            coordinator.navigateToDetail(wallpaper: wallpaper)
+                ForEach(viewModel.favorites, id: \.id) { item in
+                    MediaContentGridCell(
+                        content: item,
+                        onRemoveFavorite: {
+                            switch item {
+                            case .wallpaper(let wallpaper):
+                                viewModel.toggleFavorite(wallpaper: wallpaper)
+                            case .video(let video):
+                                viewModel.toggleFavorite(video: video)
+                            }
                         },
-                        onFavoriteToggle: {
-                            viewModel.removeFavorite(wallpaper: wallpaper)
+                        onNavigate: {
+                            switch item {
+                            case .wallpaper(let wallpaper):
+                                coordinator.navigateToWallpaperDetail(
+                                    wallpaper: wallpaper
+                                ) { w in
+                                    viewModel.toggleFavorite(wallpaper: w)
+                                }
+                            case .video(let video):
+                                coordinator.navigateToVideoDetail(video: video) { w in
+                                    viewModel.toggleFavorite(video: w)
+                                }
+                            }
                         }
                     )
                 }
             }
             .padding(.horizontal)
             .padding(.top, 8)
+        }
+    }
+}
+
+struct MediaContentGridCell: View {
+    let content: MediaContentUi
+    var onRemoveFavorite: () -> Void
+    var onNavigate: () -> Void
+
+    var body: some View {
+        switch content {
+        case .wallpaper(let wallpaper):
+            WallpaperGridCell(
+                wallpaper: wallpaper,
+                onTap: onNavigate,
+                onFavoriteToggle: onRemoveFavorite,
+                )
+
+        case .video(let video):
+            VideoGridCell(
+                video: video,
+                onTap: onNavigate,
+                onFavoriteToggle: onRemoveFavorite,
+                )
         }
     }
 }

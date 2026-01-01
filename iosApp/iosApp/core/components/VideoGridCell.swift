@@ -1,21 +1,20 @@
-import Shared
 import SwiftUI
 
-struct WallpaperGridCell: View {
-    let wallpaper: WallpaperUi
-    let onTap: () -> Void
+struct VideoGridCell: View {
+    let video: VideoUi
+    var onTap: (() -> Void)
     var onFavoriteToggle: (() -> Void)
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-
+        ZStack(alignment: .bottomTrailing) {
             Button(action: onTap) {
-                AsyncImage(url: URL(string: wallpaper.smallImageUrl)) { phase in
+                AsyncImage(url: URL(string: video.thumbnailUrl)) { phase in
                     switch phase {
                     case .empty:
                         Color.gray.opacity(0.2)
                     case .success(let image):
-                        image.resizable()
+                        image
+                            .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(minWidth: 0, maxWidth: .infinity)
                     case .failure:
@@ -30,24 +29,22 @@ struct WallpaperGridCell: View {
             }
 
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(wallpaper.photographerName)
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .shadow(radius: 2)
-                }
+                Text(video.photographerName)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .shadow(radius: 2)
 
                 Spacer()
 
                 Button(action: onFavoriteToggle) {
                     Image(
-                        systemName: wallpaper.isFavorite
+                        systemName: video.isFavorite
                             ? "heart.fill" : "heart"
                     )
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(wallpaper.isFavorite ? .red : .white)
+                        .foregroundStyle(video.isFavorite ? .red : .white)
                         .shadow(radius: 2)
                 }
             }
@@ -56,6 +53,26 @@ struct WallpaperGridCell: View {
             .environment(\.colorScheme, .dark)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+
+            VStack {
+                Text(formatDuration(video.duration))
+                    .font(.caption)
+                    .bold()
+                    .padding(6)
+                    .background(.black.opacity(0.6))
+                    .foregroundColor(.white)
+                    .cornerRadius(4)
+                    .padding(8)
+                Spacer()
+
+            }
+
         }
+    }
+
+    func formatDuration(_ seconds: Int) -> String {
+        let min = seconds / 60
+        let sec = seconds % 60
+        return String(format: "%d:%02d", min, sec)
     }
 }

@@ -9,6 +9,7 @@ struct VideoUi: Identifiable, Equatable, Hashable {
     let width: Int
     let height: Int
     let photographerName: String
+    var isFavorite: Bool
 }
 
 extension Video {
@@ -20,7 +21,8 @@ extension Video {
             duration: Int(self.duration),
             width: Int(self.width),
             height: Int(self.height),
-            photographerName: self.user.name
+            photographerName: self.user.name,
+            isFavorite: self.isFavorite
         )
     }
 }

@@ -90,7 +90,6 @@ class WallpaperListViewModel {
         Task {
             do {
                 let kmWallpaper = wallpaper.toDomain()
-                // ✅ SKIE lets you call suspend functions directly with try await
                 try await favoritesRepository.toggleFavorite(wallpaper: kmWallpaper)
             } catch {
                 self.errorMessage = error.localizedDescription

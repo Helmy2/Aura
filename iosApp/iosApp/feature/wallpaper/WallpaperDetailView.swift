@@ -3,142 +3,134 @@ import SwiftUI
 
 struct WallpaperDetailView: View {
     let wallpaper: WallpaperUi
-    let coordinator: NavigationCoordinator
-    @State private var viewModel = WallpaperDetailViewModel()
+    var onFavoriteToggle: ((WallpaperUi) -> Void)?
+
+    @State private var isFavorite: Bool
+    @State private var isDownloading = false
+    @State private var showToast = false
+    @State private var toastMessage = ""
+    @Environment(\.presentationMode) var presentationMode
+
+    init(wallpaper: WallpaperUi, onFavoriteToggle: ((WallpaperUi) -> Void)? = nil) {
+        self.wallpaper = wallpaper
+        self.onFavoriteToggle = onFavoriteToggle
+        _isFavorite = State(initialValue: wallpaper.isFavorite)
+    }
 
     var body: some View {
-        VStack {
-            HStack {
-                Button(action: { coordinator.pop() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(12)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
+        ZStack {
+            // Top Controls
+            VStack {
+                HStack {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                        Image(systemName: "arrow.left")
+                            .font(.title2)
+                            .foregroundColor(.white)
+                            .padding(10)
+                            .background(Color.black.opacity(0.4))
+                            .clipShape(Circle())
+                    }
 
-                Spacer()
+                    Spacer()
 
-                Button(action: {
-                    viewModel.toggleFavorite(wallpaper: wallpaper)
-                }) {
-                    Image(
-                        systemName: viewModel.isFavorite
-                            ? "heart.fill" : "heart"
-                    )
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(viewModel.isFavorite ? .red : .white)
-                        .padding(12)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
+                    // Favorite Button
+                    Button(action: toggleFav) {
+                        Image(systemName: isFavorite ? "heart.fill" : "heart")
+                            .font(.title2)
+                            .foregroundColor(isFavorite ? .red : .white)
+                            .padding(10)
+                            .background(Color.black.opacity(0.4))
+                            .clipShape(Circle())
+                    }
 
-                Button(action: {
-                    viewModel.downloadWallpaper(url: wallpaper.imageUrl)
-                }) {
-                    ZStack {
-                        switch viewModel.downloadState {
-
-                        case .idle:
-                            Image(systemName: "arrow.down")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundStyle(.white)
-                                .transition(.scale.combined(with: .opacity))
-                                .scaledToFill()
-
-                        case .downloading:
+                    // Download Button
+                    Button(action: downloadWallpaper) {
+                        if isDownloading {
                             ProgressView()
                                 .tint(.white)
-                                .scaleEffect(0.8)
-                                .transition(.scale.combined(with: .opacity))
-
-                        case .success:
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundStyle(.green)
-                                .transition(.scale.combined(with: .opacity))
-
-                        case .failed:
-                            Image(systemName: "xmark")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundStyle(.red)
-                                .transition(.scale.combined(with: .opacity))
+                                .padding(10)
+                                .background(Color.black.opacity(0.4))
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "arrow.down.to.line")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(10)
+                                .background(Color.black.opacity(0.4))
+                                .clipShape(Circle())
                         }
                     }
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(
-                        Circle().stroke(
-                            borderColor(for: viewModel.downloadState),
-                            lineWidth: 2
-                        )
-                    )
-                    .animation(
-                        .spring(response: 0.3, dampingFraction: 0.6),
-                        value: viewModel.downloadState
-                    )
-                }
-                .disabled(viewModel.downloadState != .idle)
-
-            }
-            .padding(.horizontal)
-
-            Spacer()
-
-            // --- Bottom Metadata Bar ---
-            HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(wallpaper.photographerName)
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-
-                    Text("Photographer")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.8))
+                    .disabled(isDownloading)
                 }
                 .padding()
 
                 Spacer()
 
-                Image(systemName: "camera.fill")
-                    .foregroundStyle(.white.opacity(0.6))
-                    .padding()
+                // Bottom Info
+                HStack {
+                    Text("Photo by \(wallpaper.photographerName)")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .shadow(radius: 2)
+                    Spacer()
+                }
+                .padding()
+                .background(
+                    LinearGradient(colors: [.clear, .black.opacity(0.7)], startPoint: .top, endPoint: .bottom)
+                )
             }
-            .background(.ultraThinMaterial)
         }
         .background(
             ZStack {
-                Color(hex: wallpaper.averageColor)
-
+                Color.black.ignoresSafeArea()
                 AsyncImage(url: URL(string: wallpaper.imageUrl)) { phase in
                     switch phase {
+                    case .empty:
+                        ProgressView().tint(.white)
                     case .success(let image):
                         image
                             .resizable()
-                            .scaledToFill()
-                    case .empty:
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(.white)
-                    default:
-                        Color.clear
+                            .aspectRatio(contentMode: .fill)
+                            .ignoresSafeArea()
+                    case .failure:
+                        Image(systemName: "photo")
+                            .font(.largeTitle)
+                            .foregroundColor(.gray)
+                    @unknown default:
+                        EmptyView()
                     }
                 }
             }
-            .ignoresSafeArea()
         )
         .navigationBarHidden(true)
-        .toolbar(.hidden, for: .tabBar)
-        .onAppear {
-            viewModel.loadFavoriteStatus(wallpaperId: wallpaper.id)
+        .alert(isPresented: $showToast) {
+            Alert(title: Text(toastMessage))
         }
     }
-}
 
-private func borderColor(for state: DownloadState) -> Color {
-    switch state {
-    case .success: return .green.opacity(0.8)
-    case .failed: return .red.opacity(0.8)
-    default: return .clear
+    private func toggleFav() {
+        isFavorite.toggle()
+        onFavoriteToggle?(wallpaper)
+    }
+
+    private func downloadWallpaper() {
+        isDownloading = true
+        Task {
+            guard let url = URL(string: wallpaper.imageUrl),
+                  let (data, _) = try? await URLSession.shared.data(from: url),
+                  let image = UIImage(data: data)
+            else {
+                isDownloading = false
+                return
+            }
+
+            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+
+            await MainActor.run {
+                isDownloading = false
+                toastMessage = "Saved to Photos"
+                showToast = true
+            }
+        }
     }
 }

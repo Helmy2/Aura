@@ -50,7 +50,11 @@ struct WallpaperListView: View {
                         ForEach(list, id: \.id) { wallpaper in
                             WallpaperGridCell(
                                 wallpaper: wallpaper,
-                                onTap: { coordinator.navigateToDetail(wallpaper: wallpaper) },
+                                onTap: {
+                                    coordinator.navigateToWallpaperDetail(wallpaper: wallpaper) { w in
+                                        viewModel.toggleFavorite(wallpaper: w)
+                                    }
+                                },
                                 onFavoriteToggle: { viewModel.toggleFavorite(wallpaper: wallpaper) }
                             )
                                 .onAppear {

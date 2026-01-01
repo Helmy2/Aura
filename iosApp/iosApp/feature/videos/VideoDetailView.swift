@@ -5,17 +5,28 @@ import SwiftUI
 
 struct VideoDetailView: View {
     let video: VideoUi
+    var onFavoriteToggle: ((VideoUi) -> Void)?
+    
     @State private var player: AVPlayer?
     @State private var isDownloading = false
     @State private var showToast = false
     @State private var toastMessage = ""
+    @State private var isFavorite: Bool
+    
     @Environment(\.presentationMode) var presentationMode
+
+    init(video: VideoUi, onFavoriteToggle: ((VideoUi) -> Void)? = nil) {
+        self.video = video
+        self.onFavoriteToggle = onFavoriteToggle
+        _isFavorite = State(initialValue: video.isFavorite)
+    }
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
 
             VStack {
+                // Top Bar
                 HStack {
                     Button(action: { presentationMode.wrappedValue.dismiss() }) {
                         Image(systemName: "arrow.left")
@@ -25,8 +36,20 @@ struct VideoDetailView: View {
                             .background(Color.black.opacity(0.4))
                             .clipShape(Circle())
                     }
+
                     Spacer()
 
+                    // NEW: Favorite Button
+                    Button(action: toggleFav) {
+                        Image(systemName: isFavorite ? "heart.fill" : "heart")
+                            .font(.title2)
+                            .foregroundColor(isFavorite ? .red : .white)
+                            .padding(10)
+                            .background(Color.black.opacity(0.4))
+                            .clipShape(Circle())
+                    }
+
+                    // Download Button
                     Button(action: downloadVideo) {
                         if isDownloading {
                             ProgressView()
@@ -35,16 +58,19 @@ struct VideoDetailView: View {
                             Image(systemName: "arrow.down.to.line")
                                 .font(.title2)
                                 .foregroundColor(.white)
+                                .padding(10)
+                                .background(Color.black.opacity(0.4))
+                                .clipShape(Circle())
                         }
                     }
-                    .padding(10)
-                    .background(Color.black.opacity(0.4))
-                    .clipShape(Circle())
                     .disabled(isDownloading)
                 }
                 .padding()
+                .zIndex(10)
 
                 Spacer()
+
+                // ... Video Player & Bottom Info (Same as before) ...
                 if let player = player {
                     VideoPlayer(player: player)
                         .onAppear {
@@ -52,9 +78,12 @@ struct VideoDetailView: View {
                         }
                 } else {
                     ProgressView()
+                        .tint(.white)
                 }
+
                 Spacer()
 
+                // Bottom Info
                 HStack {
                     Text("Video by \(video.photographerName)")
                         .font(.headline)
@@ -77,11 +106,17 @@ struct VideoDetailView: View {
         }
         .onDisappear {
             player?.pause()
+            player = nil
         }
         .alert(isPresented: $showToast) {
             Alert(title: Text(toastMessage))
         }
         .navigationBarHidden(true)
+    }
+
+    private func toggleFav() {
+        isFavorite.toggle()
+        onFavoriteToggle?(video)
     }
 
     private func setupPlayer() {

@@ -74,13 +74,16 @@ struct HomeNavigationStack: View {
                         WallpaperListView()
                     case .videoList:
                         VideosView()
-                    case .wallpaperDetail(let wallpaper):
+                    case .wallpaperDetail(let wallpaper, let onToggle):
                         WallpaperDetailView(
                             wallpaper: wallpaper,
-                            coordinator: coordinator
+                            onFavoriteToggle: onToggle
                         )
-                    case .videoDetail(let video):
-                        VideoDetailView(video: video)
+                    case .videoDetail(let video, let onToggle):
+                        VideoDetailView(
+                            video: video,
+                            onFavoriteToggle: onToggle
+                        )
                     default: EmptyView()
                     }
                 }
@@ -96,10 +99,15 @@ struct FavoritesNavigationStack: View {
             FavoritesView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
-                    case .wallpaperDetail(let wallpaper):
+                    case .wallpaperDetail(let wallpaper, let onToggle):
                         WallpaperDetailView(
                             wallpaper: wallpaper,
-                            coordinator: coordinator
+                            onFavoriteToggle: onToggle
+                        )
+                    case .videoDetail(let video, let onToggle):
+                        VideoDetailView(
+                            video: video,
+                            onFavoriteToggle: onToggle
                         )
                             .toolbar(.hidden, for: .navigationBar)
                     default: EmptyView()
@@ -127,10 +135,12 @@ struct VideosNavigationStack: View {
             VideosView()
                 .navigationDestination(for: NavigationRoute.self) { route in
                     switch route {
-                    case .videoDetail(let video):
+                    case .videoDetail(let video, let onToggle):
                         VideoDetailView(
-                            video: video
-                        ).toolbar(.hidden, for: .navigationBar)
+                            video: video,
+                            onFavoriteToggle: onToggle
+                        )
+                            .toolbar(.hidden, for: .navigationBar)
                     default: EmptyView()
                     }
                 }
