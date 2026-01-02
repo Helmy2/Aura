@@ -33,11 +33,18 @@
 |                     Android                     |                     iOS                     |
 |:-----------------------------------------------:|:-------------------------------------------:|
 | <img src="./images/android-1.png" width="250"/> | <img src="./images/ios-1.png" width="250"/> |
-| <img src="./images/android-1.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
-| <img src="./images/android-1.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
-| <img src="./images/android-1.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
-| <img src="./images/android-1.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
-| <img src="./images/android-1.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
+| <img src="./images/android-2.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
+| <img src="./images/android-3.png" width="250"/> | <img src="./images/ios-3.png" width="250"/> |
+| <img src="./images/android-4.png" width="250"/> | <img src="./images/ios-2.png" width="250"/> |
+| <img src="./images/android-4.png" width="250"/> | <img src="./images/ios-4.png" width="250"/> |
+| <img src="./images/android-5.png" width="250"/> | <img src="./images/ios-5.png" width="250"/> |
+| <img src="./images/android-6.png" width="250"/> | <img src="./images/ios-6.png" width="250"/> |
+
+Tablet 
+<img src="./images/android-8.png" width="500"/> 
+<img src="./images/android-9.png" width="500"/> 
+<img src="./images/android-10.png" width="500"/> 
+<img src="./images/android-11.png" width="500"/> 
 
 ## 🏗️ Architecture
 
