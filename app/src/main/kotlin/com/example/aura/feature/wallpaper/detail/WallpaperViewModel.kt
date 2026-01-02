@@ -15,9 +15,6 @@ import com.example.aura.feature.wallpaper.detail.WallpaperDetailIntent.Wallpaper
 import com.example.aura.shared.core.mvi.MviViewModel
 import com.example.aura.shared.core.util.ImageDownloader
 import com.example.aura.shared.navigation.AppNavigator
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class WallpaperViewModel(
@@ -45,7 +42,6 @@ class WallpaperViewModel(
             }
 
             is WallpaperLoaded -> {
-                observeFavoriteStatus(intent.wallpaper.id)
                 currentState.copy(
                     wallpaper = intent.wallpaper,
                     isLoading = false,
@@ -68,7 +64,9 @@ class WallpaperViewModel(
                         sendIntent(DownloadError(e.message ?: "Failed to update favorite"))
                     }
                 }
-                currentState.only()
+                currentState.copy(
+                    wallpaper = intent.wallpaper.copy(isFavorite = !intent.wallpaper.isFavorite)
+                ).only()
             }
 
             is FavoriteStatusUpdated -> {
@@ -93,15 +91,6 @@ class WallpaperViewModel(
                 currentState.copy(isDownloading = false).only()
             }
         }
-    }
-
-    private fun observeFavoriteStatus(wallpaperId: Long) {
-        favoritesRepository.observeFavoritesWallpapers()
-            .map { favorites -> favorites.any { it.id == wallpaperId } }
-            .onEach { isFavorite ->
-                sendIntent(FavoriteStatusUpdated(isFavorite))
-            }
-            .launchIn(viewModelScope)
     }
 
     private fun downloadWallpaper() {
