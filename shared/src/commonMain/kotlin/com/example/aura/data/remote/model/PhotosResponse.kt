@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PexelsResponseDto(
+data class PhotosResponse(
     val page: Int,
     @SerialName("per_page") val perPage: Int,
     val photos: List<PhotoDto>
@@ -13,8 +13,8 @@ data class PexelsResponseDto(
 @Serializable
 data class PhotoDto(
     val id: Long,
-    val width: Int,
-    val height: Int,
+    val width: Int?,
+    val height: Int?,
     val url: String,
     val photographer: String,
     @SerialName("photographer_url") val photographerUrl: String,

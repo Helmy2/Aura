@@ -12,16 +12,16 @@ import com.example.aura.domain.model.VideoPicture
 fun VideoDto.toDomain(isFavorite: Boolean): Video {
     return Video(
         id = id,
-        width = width,
-        height = height,
+        width = width ?: 0,
+        height = height ?: 0,
         url = url,
         image = image,
-        duration = duration,
+        duration = duration ?: 0,
         user = user.toDomain(),
-        videoFiles = videoFiles.map { it.toDomain() },
-        videoPictures = videoPictures.map { it.toDomain() },
+        videoFiles = videoFiles?.map { it.toDomain() } ?: emptyList(),
+        videoPictures = videoPictures?.map { it.toDomain() } ?: emptyList(),
         addedAt = 0,
-        isFavorite = isFavorite,
+        isFavorite = isFavorite
     )
 }
 
@@ -36,11 +36,11 @@ fun UserDto.toDomain(): User {
 fun VideoFileDto.toDomain(): VideoFile {
     return VideoFile(
         id = id,
-        quality = quality,
-        fileType = fileType,
-        width = width,
-        height = height,
-        fps = fps,
+        quality = quality.orEmpty(),
+        fileType = fileType.orEmpty(),
+        width = width ?: 0,
+        height = height ?: 0,
+        fps = fps ?: 0.0,
         link = link
     )
 }

@@ -11,8 +11,8 @@ fun PhotoDto.toDomain(isFavorite: Boolean): Wallpaper {
         photographer = photographer,
         photographerUrl = photographerUrl,
         averageColor = avgColor ?: "#CCCCCC",
-        height = height,
-        width = width,
+        height = height ?: 0,
+        width = width ?: 0,
         addedAt = 0,
         isFavorite = isFavorite,
     )
